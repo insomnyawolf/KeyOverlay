@@ -33,6 +33,8 @@ backgroundImage - Lets you set a background. Put the image into Resources direct
 
 maxFPS - Sets the target FPS for the program to run
 
+rotation - Set font roration angle : support to -90/0/90
+
 # GIF Preview
 
 ![](https://puu.sh/I6Kg1/4ff86be176.gif)
