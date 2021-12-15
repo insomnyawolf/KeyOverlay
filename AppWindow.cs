@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using sf;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
@@ -13,7 +14,7 @@ namespace KeyOverlay
     {
         private readonly RenderWindow _window;
         private readonly List<Key> _keyList = new();
-        private readonly List<RectangleShape> _squareList;
+        private readonly List<RoundedRectangleShape> _squareList;
         private readonly float _barSpeed;
         private readonly float _ratioX;
         private readonly float _ratioY;
@@ -27,6 +28,7 @@ namespace KeyOverlay
         private readonly bool _counter;
         private readonly List<Drawable> _staticDrawables = new();
         private readonly uint _maxFPS;
+        private readonly int _rotation;
         private Clock _clock = new();
 
 
@@ -48,6 +50,7 @@ namespace KeyOverlay
             _keyBackgroundColor = CreateItems.CreateColor(config["keyColor"]);
             _barColor = CreateItems.CreateColor(config["barColor"]);
             _maxFPS = uint.Parse(config["maxFPS"]);
+            _rotation = int.Parse(config["rotation"]);
 
             //get background image if in config
             if (config["backgroundImage"] != "")
@@ -87,7 +90,7 @@ namespace KeyOverlay
             for (var i = 0; i < keyAmount; i++)
             {
                 var text = CreateItems.CreateText(_keyList.ElementAt(i).KeyLetter, _squareList.ElementAt(i),
-                    _fontColor, false);
+                    _fontColor, false, _rotation);
                 _staticDrawables.Add(text);
             }
 
@@ -114,10 +117,13 @@ namespace KeyOverlay
         {
             _window.Closed += OnClose;
             _window.SetFramerateLimit(_maxFPS);
+            var config = ReadConfig();
+            var keySize = int.Parse(config["keySize"]);
+            var margin = int.Parse(config["margin"]);
 
             //Creating a sprite for the fading effect
-            var fadingList = Fading.GetBackgroundColorFadingTexture(_backgroundColor, _window.Size.X, _ratioY);
-            var fadingTexture = new RenderTexture(_window.Size.X, (uint)(255 * 2 * _ratioY));
+            var fadingList = Fading.GetBackgroundColorFadingTexture(_backgroundColor, _window.Size.X, _ratioY, keySize);
+            var fadingTexture = new RenderTexture(_window.Size.X, (uint)(_ratioY * 960 - _outlineThickness - 2 * keySize - margin));
             fadingTexture.Clear(Color.Transparent);
             if (_fading)
                 foreach (var sprite in fadingList)
@@ -159,7 +165,7 @@ namespace KeyOverlay
                     {
                         var text = CreateItems.CreateText(Convert.ToString(key.Counter),
                             _squareList.ElementAt(_keyList.IndexOf(key)),
-                            _fontColor, true);
+                            _fontColor, true, _rotation);
                         _window.Draw(text);
                     }
 
@@ -176,7 +182,7 @@ namespace KeyOverlay
         /// <summary>
         /// if a key is a new input create a new bar, if it is being held stretch it and move all bars up
         /// </summary>
-        private void MoveBars(List<Key> keyList, List<RectangleShape> squareList)
+        private void MoveBars(List<Key> keyList, List<RoundedRectangleShape> squareList)
         {
             var moveDist = _clock.Restart().AsSeconds() * _barSpeed;
 
