@@ -444,19 +444,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Daniel\\.nuget\\packages\\": {}
+    "C:\\Users\\hasee\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Daniel\\source\\KeyOverlay\\KeyOverlay.csproj",
+      "projectUniqueName": "E:\\test\\KeyOverlay\\KeyOverlay.csproj",
       "projectName": "KeyOverlay",
-      "projectPath": "C:\\Users\\Daniel\\source\\KeyOverlay\\KeyOverlay.csproj",
-      "packagesPath": "C:\\Users\\Daniel\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Daniel\\source\\KeyOverlay\\obj\\",
+      "projectPath": "E:\\test\\KeyOverlay\\KeyOverlay.csproj",
+      "packagesPath": "C:\\Users\\hasee\\.nuget\\packages\\",
+      "outputPath": "E:\\test\\KeyOverlay\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Daniel\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\hasee\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -502,7 +502,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.302\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.100\\RuntimeIdentifierGraph.json"
       }
     }
   }
