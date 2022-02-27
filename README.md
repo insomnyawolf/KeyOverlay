@@ -2,7 +2,7 @@
 # KeyOverlay
  A simple key overlay for osu! streaming
 To change the keys used please use config.txt
-# [Download Link](https://github.com/Blondazz/KeyOverlay/releases/tag/v1.0)
+# [Download Link](https://github.com/gxytcgxytc/KeyOverlay/releases/tag/v1.1.0)
 IF YOU ARE HAVING PROBLEMS WITH THE PROGRAM WHEN OSU! IS ON FULLSCREEN, TRY USING GAME CAPTURE INSTEAD OF WINDOW CAPTURE IN OBS!
 
 
@@ -37,7 +37,7 @@ rotation - Set font roration angle : support to -90/0/90
 
 # GIF Preview
 
-![](https://puu.sh/I6Kg1/4ff86be176.gif)
+![](https://puu.sh/ILKeQ/ade16628ca.gif)
 
 based on a similar app by an unknown author (if you are the author dm me so I can credit you)
 
