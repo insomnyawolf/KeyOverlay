@@ -39,6 +39,7 @@ Hopefully it will be easily understood by everyone but if you have troubles with
 
 * Hot reload (not yet)
 * Key Profiles (for diferent games/gamemodes as example)
+* Remove dependence on sfml and use [https://github.com/Quaver/Wobble](https://github.com/Quaver/Wobble) instead.
 
 ## Insomnya's note
 
