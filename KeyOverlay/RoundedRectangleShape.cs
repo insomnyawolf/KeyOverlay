@@ -80,10 +80,10 @@ namespace sf
             Vector2f center = new Vector2f();
             int centerIndex = (int)(index / myCornerPointCount);
 
-#warning Chekc if that's worth (maybe it has some impact on performance)
-            //const float pi = 3.141592654f;
-            const double pi = Math.PI;
-            
+#warning Chekc if that is worth (maybe it has some impact on performance)
+            const float pi = 3.141592654f;
+            //const double pi = Math.PI;
+
 
             switch (centerIndex)
             {

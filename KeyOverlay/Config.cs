@@ -12,7 +12,8 @@ namespace KeyOverlay
         //public int Width { get; set; }
         public ushort Height { get; set; } = 700;
         public byte KeySize { get; set; } = 125;
-        public byte Margin { get; set; } = 100;
+        public byte KeySpacing { get; set; } = 1;
+        public ushort Margin { get; set; } = 100;
         public ushort MaxFps { get; set; } = 60;
         public int BarSpeed { get; set; } = 600;
         public int OutLineThickness { get; set; } = 5;
@@ -34,7 +35,7 @@ namespace KeyOverlay
                 Key = "z",
                 DisplayName = null,
                 Count = 0,
-                Color = Color.Cyan,
+                Color = Color.Blue,
                 IsDisabled = false,
             },
             new KeyMapping()
@@ -43,15 +44,24 @@ namespace KeyOverlay
                 Key = "x",
                 DisplayName = null,
                 Count = 0,
-                Color = Color.Cyan,
+                Color = Color.Blue,
                 IsDisabled = false,
+            },
+            new KeyMapping()
+            {
+                KeyType = KeyType.Keyboard,
+                Key = "q",
+                DisplayName = null,
+                Count = 0,
+                Color = Color.Blue,
+                IsDisabled = true,
             },
             //https://www.sfml-dev.org/documentation/2.5.1/Mouse_8hpp_source.php
             new KeyMapping()
             {
                 KeyType = KeyType.Mouse,
                 Key = "0",
-                DisplayName = "Left CLick",
+                DisplayName = "LMB",
                 Count = 0,
                 Color = Color.Magenta,
                 IsDisabled = false,
@@ -60,10 +70,10 @@ namespace KeyOverlay
             {
                 KeyType = KeyType.Mouse,
                 Key = "1",
-                DisplayName = "Right Click",
+                DisplayName = "RMB",
                 Count = 0,
                 Color = Color.Magenta,
-                IsDisabled = true,
+                IsDisabled = false,
             },
         };
     }

@@ -22,6 +22,7 @@ Hopefully the Config can be easily understood by everyone but if it isn't i'll t
 ## New Features
 
 * Per-Key Color
+* Width automatically calculated
 * Per-Key HitCount saving
 
 ## Known Issues

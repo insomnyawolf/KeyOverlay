@@ -14,20 +14,21 @@ namespace KeyOverlay
         {
             var rect = new RectangleShape(new Vector2f(square.mySize.X + outlineThickness * 2, barSpeed));
 
-            rect.Position = new Vector2f(square.Position.X - outlineThickness, square.Position.Y - square.mySize.Y - square.OutlineThickness);
+#warning To-Do Better rounded effec by displacing the bar a bit lower (need to be rendered BEHIND the ui to work as expected)
+            rect.Position = new Vector2f(square.Position.X - outlineThickness, square.Position.Y - (square.mySize.Y) - square.OutlineThickness);
 
             rect.FillColor = square.FillColor;
 
             return rect;
         }
 
-        public static List<RoundedRectangleShape> CreateKeys(int keyAmount, int outlineThickness, float size, double ratioX, double ratioY,
+        public static List<RoundedRectangleShape> CreateKeys(int keyAmount, int outlineThickness, float size, float spacing, double ratioX, double ratioY,
             int margin, RenderWindow window, Color backgroundColor, Color outlineColor)
         {
             var yPos = 900 * ratioY;
             var width = size + outlineThickness * 2;
             var keyList = new List<RoundedRectangleShape>();
-            var spacing = (window.Size.X - margin * 2 - width * keyAmount) / (keyAmount - 1);
+            //var spacing = (window.Size.X - margin * 2 - width * keyAmount) / (keyAmount - 1);
             for (int i = 0; i < keyAmount; i++)
             {
                 var square = new RoundedRectangleShape(new Vector2f(size, size), 5, 100);
@@ -35,7 +36,7 @@ namespace KeyOverlay
                 square.OutlineColor = outlineColor;
                 square.OutlineThickness = outlineThickness;
                 square.Origin = new Vector2f(0, size);
-                square.Position = new Vector2f(margin +outlineThickness + (width + spacing ) * i , (float)yPos); 
+                square.Position = new Vector2f(margin + (outlineThickness + width + spacing) * i , (float)yPos); 
                 keyList.Add(square);
             }
             return keyList;
@@ -69,10 +70,10 @@ namespace KeyOverlay
             return text;
         }
         
-        public static Color CreateColor(string s)
-        {
-            var bytes = s.Split(',').Select(int.Parse).Select(Convert.ToByte).ToArray();
-            return new Color(bytes[0], bytes[1], bytes[2], bytes[3]);
-        }
+        //public static Color CreateColor(string s)
+        //{
+        //    var bytes = s.Split(',').Select(int.Parse).Select(Convert.ToByte).ToArray();
+        //    return new Color(bytes[0], bytes[1], bytes[2], bytes[3]);
+        //}
     }
 }

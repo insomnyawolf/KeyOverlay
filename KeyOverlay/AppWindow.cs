@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using ConfigHelper;
 using sf;
 using SFML.Graphics;
 using SFML.System;
@@ -91,11 +90,18 @@ namespace KeyOverlay
                 windowHeight = Configuration.Height;
             }
 
-            var tempWidth = (ushort)((Configuration.KeySize * ActiveKeys) + (Configuration.Margin * 2));
+            var tempWidth = (ushort)((Configuration.KeySize * ActiveKeys) + (Configuration.OutLineThickness * ActiveKeys * 2) + (Configuration.Margin * 2) + (Configuration.KeySpacing * (ActiveKeys - 1)));
 
             if (tempWidth > windowWidth)
             {
                 windowWidth = tempWidth;
+            }
+            else
+            {
+                // Adjust margin
+                var diff = windowWidth - tempWidth;
+
+                Configuration.Margin += (ushort)(tempWidth / 2);
             }
 
             Window = new RenderWindow(new VideoMode(windowWidth, windowHeight), "KeyOverlay", Styles.Default);
@@ -107,7 +113,7 @@ namespace KeyOverlay
             Font = new Font(Path.GetFullPath(Path.Combine(ResourcesLocation, Configuration.Font)));
 
             //create squares
-            SquareList = CreateItems.CreateKeys(ActiveKeys, Configuration.OutLineThickness, Configuration.KeySize, RatioX, RatioY, Configuration.Margin, Window, Configuration.KeyBackgroundColor, Configuration.BorderColor);
+            SquareList = CreateItems.CreateKeys(ActiveKeys, Configuration.OutLineThickness, Configuration.KeySize, Configuration.KeySpacing, RatioX, RatioY, Configuration.Margin, Window, Configuration.KeyBackgroundColor, Configuration.BorderColor);
 
             StaticDrawables = new();
 
@@ -124,7 +130,7 @@ namespace KeyOverlay
 
             //Creating a sprite for the fading effect
             var fadingList = Fading.GetBackgroundColorFadingTexture(Configuration.BackgroundColor, Window.Size.X, RatioY, Configuration.KeySize);
-            var fadingTexture = new RenderTexture(Window.Size.X, (uint)(RatioY * 960 - Configuration.OutLineThickness - 2 * Configuration.KeySize - Configuration.Margin));
+            var fadingTexture = new RenderTexture(Window.Size.X, (uint)(RatioY * 960 - (Configuration.OutLineThickness * 2 - Configuration.KeySize - Configuration.Margin)));
 
             fadingTexture.Clear(Color.Transparent);
 
@@ -168,6 +174,7 @@ namespace KeyOverlay
                 {
                     SquareList[i].FillColor = Configuration.KeyBackgroundColor;
                 }
+
                 //if a key is being held, change the key bg and increment hold variable of key
                 for (int i = 0; i < KeyList.Count; i++)
                 {
@@ -226,7 +233,6 @@ namespace KeyOverlay
         private void MoveBars(List<Key> keyList, List<RoundedRectangleShape> squareList)
         {
             // Normalize
-
             var moveDist = Clock.Restart().AsSeconds() * Configuration.BarSpeed;
 
             for (int i = 0; i < keyList.Count; i++)

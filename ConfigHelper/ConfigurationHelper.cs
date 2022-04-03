@@ -109,11 +109,10 @@ namespace ConfigHelper
         public void Load()
         {
             Semaphore.Wait();
-            
-            Thread.Sleep(100);
-
             if (!File.Exists(ConfigFullPath) || FileStream.Length == 0)
             {
+                // IMPORTANT, prevents deadlock
+                Semaphore.Release();
                 Save();
             }
 
