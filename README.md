@@ -32,11 +32,13 @@ Hopefully it will be easily understood by everyone but if you have troubles with
 
 * White-Screen sometimes (?)
   * Cause traced (more or less), it's related to the fading part so it'll be disabled till a fix is found (help aprecciated)
+  * Maybe it's caused due to texture corruption, try checking the texture before drawing
 * You Tell Me
 
 ## Planned features
 
 * Hot reload (not yet)
+* Key Profiles (for diferent games/gamemodes as example)
 
 ## Insomnya's note
 
