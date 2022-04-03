@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 using sf;
 using SFML.Graphics;
 using SFML.System;
@@ -43,26 +42,16 @@ namespace KeyOverlay
             //create keys which will be used to create the squares and text
             for (var i = 0; i < Configuration.Keys.Count; i++)
             {
-                try
-                {
-                    var current = Configuration.Keys[i];
+                var current = Configuration.Keys[i];
 
-                    if (current.IsDisabled)
-                    {
-                        continue;
-                    }
-
-                    ActiveKeys++;
-                    var key = new Key(current);
-                    KeyList.Add(key);
-                }
-                catch (InvalidOperationException e)
+                if (current.IsDisabled)
                 {
-                    //invalid key
-                    Console.WriteLine(e.Message);
-                    using var sw = new StreamWriter("keyErrorMessage.txt");
-                    sw.WriteLine(e.Message);
+                    continue;
                 }
+
+                ActiveKeys++;
+                var key = new Key(current);
+                KeyList.Add(key);
             }
 
             ushort windowWidth = 0;
@@ -120,10 +109,12 @@ namespace KeyOverlay
                 StaticDrawables.Add(text);
             }
 
+#warning fails for some reason and crash the program
             if (Configuration.Fade)
             {
                 //Creating a sprite for the fading effect
-                var fadingList = Fading.GetBackgroundColorFadingTexture(Configuration.BackgroundColor, Window.Size.X, RatioY, Configuration.KeySize);
+                var fadingList = Fading.GetBackgroundColorFadingTexture(Configuration.BackgroundColor, Window.Size.X, RatioY);
+
                 var fadingTexture = new RenderTexture(Window.Size.X, (uint)(RatioY * 960 - (Configuration.OutLineThickness * 2 - Configuration.KeySize - Configuration.Margin)));
 
                 fadingTexture.Clear(Color.Transparent);
@@ -145,7 +136,7 @@ namespace KeyOverlay
 
         private void OnClose(object sender, EventArgs e)
         {
-            //Window.Close();
+            Window.Close();
         }
 
         /// <summary>

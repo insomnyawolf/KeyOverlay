@@ -30,9 +30,13 @@ Hopefully it will be easily understood by everyone but if you have troubles with
 
 ## Known Issues
 
-* Hot reload not properly working (yet)
 * White-Screen sometimes (?)
+  * Cause traced (more or less), it's related to the fading part so it'll be disabled till a fix is found (help aprecciated)
 * You Tell Me
+
+## Planned features
+
+* Hot reload (not yet)
 
 ## Insomnya's note
 

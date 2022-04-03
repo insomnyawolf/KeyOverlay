@@ -31,9 +31,9 @@ namespace ConfigHelper
 
         private readonly FileStream FileStream;
 
-        static SemaphoreSlim Semaphore = new(1);
+        private readonly SemaphoreSlim Semaphore = new(1);
 
-        private ILogger<ConfigurationHelper<T>> Logger;
+        private readonly ILogger<ConfigurationHelper<T>> Logger;
 
         public T Config { get; private set; }
 

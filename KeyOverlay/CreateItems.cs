@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Collections.Generic;
 using sf;
 using SFML.Graphics;
 using SFML.System;
@@ -73,11 +70,5 @@ namespace KeyOverlay
             
             return text;
         }
-        
-        //public static Color CreateColor(string s)
-        //{
-        //    var bytes = s.Split(',').Select(int.Parse).Select(Convert.ToByte).ToArray();
-        //    return new Color(bytes[0], bytes[1], bytes[2], bytes[3]);
-        //}
     }
 }
