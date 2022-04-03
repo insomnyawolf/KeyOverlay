@@ -18,7 +18,12 @@ namespace KeyOverlay
         public Key(KeyMapping key)
         {
             KeyMapping = key;
-            KeyMapping.Key = KeyMapping.Key.ToUpper();
+
+            // This helps to validate configs for most users
+            if (KeyMapping.Key.Length == 1)
+            {
+                KeyMapping.Key = KeyMapping.Key.ToUpper();
+            }
 
             switch (KeyMapping.KeyType)
             {
@@ -30,7 +35,7 @@ namespace KeyOverlay
                     }
                     break;
                 case KeyType.Mouse:
-                    
+
                     if (!Enum.TryParse(KeyMapping.Key, out MouseButton))
                     {
                         ThrowExc(KeyMapping);
