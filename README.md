@@ -1,11 +1,9 @@
 
 # KeyOverlay
- A simple key overlay for osu! streaming
- 
- If you're interested in per key coloring and custom width for your keys please check out [Friedchiken-42's version](https://github.com/Friedchicken-42/KeyOverlay) better suited for mania.
-To change the keys used please use config.txt
-# [Download Link](https://github.com/gxytcgxytc/KeyOverlay/releases/tag/v1.1.0)
-IF YOU ARE HAVING PROBLEMS WITH THE PROGRAM WHEN OSU! IS ON FULLSCREEN, TRY USING GAME CAPTURE INSTEAD OF WINDOW CAPTURE IN OBS!
+ A simple multipropouse key overlay (pss, works for osu! too)
+
+# [Download Link]() Not ready yet
+IF YOU ARE HAVING PROBLEMS WITH FULLSCREEN, TRY USING GAME CAPTURE INSTEAD OF WINDOW CAPTURE IN OBS!
 
 
 ## config.json properties
@@ -24,7 +22,7 @@ Hopefully the Config can be easily understood by everyone but if it isn't i'll t
 ## New Features
 
 * Per-Key Color
-* Keycount saving
+* Per-Key HitCount saving
 
 ## Known Issues
 
@@ -33,7 +31,9 @@ Hopefully the Config can be easily understood by everyone but if it isn't i'll t
 
 ## Insomnya's note
 
-This is basically a BIG rewrite focused on trying to add features from several different branches.
+This is basically a BIG rewrite focused on trying to add features from several different branches and optimize what we had already (bruh linq is cool but wa completly stupid to use it here, changing ``foreach`` into ``for`` is faster and also give you the index that they were using on linq to find things, i know it ain't much but each bit counts).
+
+↑ I've already suffered this problem in the past, one learn something new and tries to use it everywhere... it happens sometimes ¯\_(ツ)_/¯ ↑
 
 I'm also trying to achive "hot-reloading" so you can change the config of the program and it updates the ui without needen to close and reopen it.
 
