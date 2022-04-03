@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using sf;
 using SFML.Graphics;
 using SFML.System;
@@ -15,36 +16,27 @@ namespace KeyOverlay
 
         public static Config Configuration => Program.ConfigHelper.Config;
 
-        public bool ShallStart = true;
+        private readonly int ActiveKeys;
+        private readonly RenderWindow Window;
 
-        private int ActiveKeys;
-        private RenderWindow Window;
+        private readonly double RatioX;
+        private readonly double RatioY;
 
-        private double RatioX;
-        private double RatioY;
+        private readonly List<Key> KeyList;
+        private readonly List<RoundedRectangleShape> SquareList;
+        private readonly List<Drawable> StaticDrawables;
 
-        private List<Key> KeyList;
-        private List<RoundedRectangleShape> SquareList;
-        private List<Drawable> StaticDrawables;
+        private readonly Sprite Background;
+        private readonly Sprite FadingSprite;
+        private readonly Font Font;
 
-        private Sprite Background;
-        private Sprite FadingSprite;
-        private Font Font;
-
-        private Clock Clock = new();
+        private readonly Clock Clock = new();
 
         // I don't get the implementation of rotation
         // it behaves in a weird way
 
         public AppWindow()
         {
-            Program.ConfigHelper.OnConfigurationChanged += Reload;
-        }
-
-        public void Load()
-        {
-            Window?.Close();
-
             ActiveKeys = 0;
 
             KeyList = new();
@@ -104,7 +96,7 @@ namespace KeyOverlay
                 Configuration.Margin += (ushort)(tempWidth / 2);
             }
 
-            Window = new RenderWindow(new VideoMode(windowWidth, windowHeight), "KeyOverlay", Styles.Default);
+            Window = new RenderWindow(new VideoMode(windowWidth, windowHeight), "KeyOverlay", Styles.Close);
 
             //calculate screen ratio relative to original program size for easy resizing
             RatioX = windowWidth / 480d;
@@ -128,103 +120,32 @@ namespace KeyOverlay
                 StaticDrawables.Add(text);
             }
 
-            //Creating a sprite for the fading effect
-            var fadingList = Fading.GetBackgroundColorFadingTexture(Configuration.BackgroundColor, Window.Size.X, RatioY, Configuration.KeySize);
-            var fadingTexture = new RenderTexture(Window.Size.X, (uint)(RatioY * 960 - (Configuration.OutLineThickness * 2 - Configuration.KeySize - Configuration.Margin)));
-
-            fadingTexture.Clear(Color.Transparent);
-
             if (Configuration.Fade)
             {
+                //Creating a sprite for the fading effect
+                var fadingList = Fading.GetBackgroundColorFadingTexture(Configuration.BackgroundColor, Window.Size.X, RatioY, Configuration.KeySize);
+                var fadingTexture = new RenderTexture(Window.Size.X, (uint)(RatioY * 960 - (Configuration.OutLineThickness * 2 - Configuration.KeySize - Configuration.Margin)));
+
+                fadingTexture.Clear(Color.Transparent);
+
+
                 for (int i = 0; i < fadingList.Count; i++)
                 {
                     fadingTexture.Draw(fadingList[i]);
                 }
+
+                fadingTexture.Display();
+
+                FadingSprite = new Sprite(fadingTexture.Texture);
             }
-
-            fadingTexture.Display();
-
-            FadingSprite = new Sprite(fadingTexture.Texture);
 
             Window.Closed += OnClose;
             Window.SetFramerateLimit(Configuration.MaxFps);
-
-            ShallStart = false;
         }
 
         private void OnClose(object sender, EventArgs e)
         {
-            Window.Close();
-        }
-
-        private void Reload()
-        {
-            ShallStart = true;
-        }
-
-        public void Run()
-        {
-            while (Window.IsOpen)
-            {
-                Window.Clear(Configuration.BackgroundColor);
-                Window.DispatchEvents();
-
-                //if no keys are being held fill the square with bg color
-                for (int i = 0; i < SquareList.Count; i++)
-                {
-                    SquareList[i].FillColor = Configuration.KeyBackgroundColor;
-                }
-
-                //if a key is being held, change the key bg and increment hold variable of key
-                for (int i = 0; i < KeyList.Count; i++)
-                {
-                    var key = KeyList[i];
-                    if (key.isKey && Keyboard.IsKeyPressed(key.KeyboardKey) || !key.isKey && Mouse.IsButtonPressed(key.MouseButton))
-                    {
-                        key.Hold++;
-                        SquareList[i].FillColor = key.KeyMapping.Color;
-                    }
-                    else
-                    {
-                        key.Hold = 0;
-                    }
-                }
-
-                MoveBars(KeyList, SquareList);
-
-                //draw bg from image if not null
-
-                if (Background is not null)
-                {
-                    Window.Draw(Background);
-                }
-
-                for (int i = 0; i < StaticDrawables.Count; i++)
-                {
-                    Window.Draw(StaticDrawables[i]);
-                }
-
-                for (int i = 0; i < KeyList.Count; i++)
-                {
-                    var key = KeyList[i];
-
-                    if (Configuration.HitCount)
-                    {
-                        var text = CreateItems.CreateText(key.KeyMapping.Count.ToString(), SquareList[i], Configuration.FontColor, true, Configuration.TextRotation, Font);
-                        Window.Draw(text);
-                    }
-
-                    for (int j = 0; j < key.BarList.Count; j++)
-                    {
-                        Window.Draw(key.BarList[j]);
-                    }
-
-                }
-
-                Window.Draw(FadingSprite);
-
-                Window.Display();
-            }
+            //Window.Close();
         }
 
         /// <summary>
@@ -245,7 +166,7 @@ namespace KeyOverlay
                     key.BarList.Add(rect);
                     key.KeyMapping.Count++;
                 }
-                else if (key.Hold > 1)
+                else if (key.Hold > 1 && key.BarList.Count > 0)
                 {
                     var rect = key.BarList[^1];
                     rect.Size = new Vector2f(rect.Size.X, rect.Size.Y + moveDist);
@@ -265,6 +186,72 @@ namespace KeyOverlay
                         key.BarList.RemoveAt(0);
                     }
                 }
+            }
+        }
+
+        public void Run()
+        {
+            while (Window.IsOpen)
+            {
+                Window.DispatchEvents();
+                Window.Clear(Configuration.BackgroundColor);
+
+                //if a key is being held, change the key bg and increment hold variable of key
+                for (int i = 0; i < KeyList.Count; i++)
+                {
+                    var key = KeyList[i];
+                    if (key.isKey && Keyboard.IsKeyPressed(key.KeyboardKey) || !key.isKey && Mouse.IsButtonPressed(key.MouseButton))
+                    {
+                        key.Hold++;
+                        SquareList[i].FillColor = key.KeyMapping.Color;
+                    }
+                    else
+                    {
+                        key.Hold = 0;
+                    }
+                }
+
+                MoveBars(KeyList, SquareList);
+
+                //if no keys are being held fill the square with bg color
+                for (int i = 0; i < SquareList.Count; i++)
+                {
+                    SquareList[i].FillColor = Configuration.KeyBackgroundColor;
+                }
+
+                //draw bg from image if not null
+                if (Background is not null)
+                {
+                    Window.Draw(Background);
+                }
+
+                for (int i = 0; i < KeyList.Count; i++)
+                {
+                    var key = KeyList[i];
+
+                    if (Configuration.HitCount)
+                    {
+                        var text = CreateItems.CreateText(key.KeyMapping.Count.ToString(), SquareList[i], Configuration.FontColor, true, Configuration.TextRotation, Font);
+                        Window.Draw(text);
+                    }
+
+                    for (int j = 0; j < key.BarList.Count; j++)
+                    {
+                        Window.Draw(key.BarList[j]);
+                    }
+                }
+
+                for (int i = 0; i < StaticDrawables.Count; i++)
+                {
+                    Window.Draw(StaticDrawables[i]);
+                }
+
+                if (Configuration.Fade)
+                {
+                    Window.Draw(FadingSprite);
+                }
+
+                Window.Display();
             }
         }
     }

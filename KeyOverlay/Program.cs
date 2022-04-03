@@ -14,15 +14,8 @@ namespace KeyOverlay
             try
             {
                 var window = new AppWindow();
-
-                while (window.ShallStart)
-                {
-                    window.Load();
-                    window.Run();
-                }
-
+                window.Run();
                 ConfigHelper.Save();
-
             }
             catch (Exception e)
             {

@@ -50,6 +50,15 @@ namespace KeyOverlay
             new KeyMapping()
             {
                 KeyType = KeyType.Keyboard,
+                Key = "C",
+                DisplayName = null,
+                Count = 0,
+                Color = Color.Blue,
+                IsDisabled = false,
+            },
+            new KeyMapping()
+            {
+                KeyType = KeyType.Keyboard,
                 Key = "Numpad0",
                 DisplayName = "Np0",
                 Count = 0,

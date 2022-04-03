@@ -14,8 +14,7 @@ namespace KeyOverlay
         {
             var rect = new RectangleShape(new Vector2f(square.mySize.X + outlineThickness * 2, barSpeed));
 
-#warning To-Do Better rounded effec by displacing the bar a bit lower (need to be rendered BEHIND the ui to work as expected)
-            rect.Position = new Vector2f(square.Position.X - outlineThickness, square.Position.Y - (square.mySize.Y) - square.OutlineThickness);
+            rect.Position = new Vector2f(square.Position.X - outlineThickness, square.Position.Y - (square.mySize.Y / 2) - square.OutlineThickness);
 
             rect.FillColor = square.FillColor;
 
@@ -28,7 +27,6 @@ namespace KeyOverlay
             var yPos = 900 * ratioY;
             var width = size + outlineThickness * 2;
             var keyList = new List<RoundedRectangleShape>();
-            //var spacing = (window.Size.X - margin * 2 - width * keyAmount) / (keyAmount - 1);
             for (int i = 0; i < keyAmount; i++)
             {
                 var square = new RoundedRectangleShape(new Vector2f(size, size), 5, 100);
@@ -53,7 +51,9 @@ namespace KeyOverlay
             float extraWidth = 0;
             float extraHeight = 0;
             if (rotation < 0)
+            {
                 extraWidth = square.mySize.X;
+            }
             else if (rotation == 0)
             {
                 extraWidth = square.mySize.X / 2f;
@@ -61,11 +61,15 @@ namespace KeyOverlay
             }
               
             if (counter)
+            {
                 text.Position = new Vector2f(square.GetGlobalBounds().Left + square.OutlineThickness - text.CharacterSize /3 * 2 * rotation/90f + extraWidth,
                     square.GetGlobalBounds().Top + square.OutlineThickness + text.CharacterSize * 3 / 2 + extraHeight);
+            }
             else
+            {
                 text.Position = new Vector2f(square.GetGlobalBounds().Left + square.OutlineThickness + square.mySize.X / 2f,
                     square.GetGlobalBounds().Top + square.OutlineThickness + square.mySize.Y / 2f);
+            }
             
             return text;
         }
