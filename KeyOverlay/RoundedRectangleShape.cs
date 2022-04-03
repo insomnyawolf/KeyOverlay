@@ -23,9 +23,6 @@
 // Headers
 ////////////////////////////////////////////////////////////
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using SFML.Graphics;
 using SFML.System;
 
@@ -39,14 +36,12 @@ namespace sf
             mySize = size;
             myRadius = radius;
             myCornerPointCount = cornerPointCount;
-            // Update();
         }
 
         ////////////////////////////////////////////////////////////
         public void SetSize(Vector2f size)
         {
             mySize = size;
-           // Update();
         }
 
         ////////////////////////////////////////////////////////////
@@ -59,7 +54,6 @@ namespace sf
         public void SetCornersRadius(float radius)
         {
             myRadius = radius;
-           // Update();
         }
 
         ////////////////////////////////////////////////////////////
@@ -72,7 +66,6 @@ namespace sf
         public void SetCornerPointCount(int count)
         {
             myCornerPointCount = count;
-           // Update();
         }
 
 
@@ -86,7 +79,11 @@ namespace sf
             float deltaAngle = 90.0f / (myCornerPointCount - 1);
             Vector2f center = new Vector2f();
             int centerIndex = (int)(index / myCornerPointCount);
-            const float pi = 3.141592654f;
+
+#warning Chekc if that's worth (maybe it has some impact on performance)
+            //const float pi = 3.141592654f;
+            const double pi = Math.PI;
+            
 
             switch (centerIndex)
             {
@@ -99,8 +96,7 @@ namespace sf
             float f1 = Convert.ToSingle(s);
             string s2 = Math.Sin(deltaAngle * (index - centerIndex) * pi / 180).ToString();
             float f2 = Convert.ToSingle(s2);
-            return new Vector2f(myRadius * f1 + center.X,
-                   -myRadius * f2 + center.Y);
+            return new Vector2f(myRadius * f1 + center.X, -myRadius * f2 + center.Y);
         }
 
         public override uint GetPointCount()
@@ -108,13 +104,8 @@ namespace sf
             return (uint)(myCornerPointCount * 4);
         }
 
-
-
         public float myRadius;
         public int myCornerPointCount;
         public Vector2f mySize;
     }
 }
-
-
-        // namespace sf

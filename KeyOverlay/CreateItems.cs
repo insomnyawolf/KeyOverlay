@@ -10,18 +10,18 @@ namespace KeyOverlay
 {
     public static class CreateItems
     {
-        public static readonly Font _font = new Font(Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "Resources",
-            "consolab.ttf")));
         public static RectangleShape CreateBar(RoundedRectangleShape square, int outlineThickness, float barSpeed)
         {
             var rect = new RectangleShape(new Vector2f(square.mySize.X + outlineThickness * 2, barSpeed));
-            rect.Position = new Vector2f(square.Position.X - outlineThickness,
-                square.Position.Y - square.mySize.Y - square.OutlineThickness);
+
+            rect.Position = new Vector2f(square.Position.X - outlineThickness, square.Position.Y - square.mySize.Y - square.OutlineThickness);
+
             rect.FillColor = square.FillColor;
+
             return rect;
         }
 
-        public static List<RoundedRectangleShape> CreateKeys(int keyAmount, int outlineThickness, float size, float ratioX, float ratioY,
+        public static List<RoundedRectangleShape> CreateKeys(int keyAmount, int outlineThickness, float size, double ratioX, double ratioY,
             int margin, RenderWindow window, Color backgroundColor, Color outlineColor)
         {
             var yPos = 900 * ratioY;
@@ -35,15 +35,15 @@ namespace KeyOverlay
                 square.OutlineColor = outlineColor;
                 square.OutlineThickness = outlineThickness;
                 square.Origin = new Vector2f(0, size);
-                square.Position = new Vector2f(margin +outlineThickness + (width + spacing ) * i , yPos); 
+                square.Position = new Vector2f(margin +outlineThickness + (width + spacing ) * i , (float)yPos); 
                 keyList.Add(square);
             }
             return keyList;
         }
 
-        public static Text CreateText(string key, RoundedRectangleShape square, Color color, bool counter, int rotation)
+        public static Text CreateText(string key, RoundedRectangleShape square, Color color, bool counter, int rotation, Font font)
         {
-            var text = new Text(key, _font);
+            var text = new Text(key, font);
             text.CharacterSize = (uint)(50 * square.mySize.X / 140);
             text.Style = Text.Styles.Bold;
             text.FillColor = color;

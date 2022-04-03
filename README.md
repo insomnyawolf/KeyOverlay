@@ -8,38 +8,37 @@ To change the keys used please use config.txt
 IF YOU ARE HAVING PROBLEMS WITH THE PROGRAM WHEN OSU! IS ON FULLSCREEN, TRY USING GAME CAPTURE INSTEAD OF WINDOW CAPTURE IN OBS!
 
 
-## config.txt properties
-keyAmount - The amount of keys in the program (see the readme.txt for recommended widths for certain keyAmounts).
+## config.json properties
+keyAmount - Calculated via defined and enabled keys
 
-key1, key2 ... - Keys the program should use (UPPERCASE), for numbers and symbols [please refer to this table](https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Keyboard.php#acb4cacd7cc5802dec45724cf3314a142), for mouse buttons add m before the [mouse button options](https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Mouse.php#a4fb128be433f9aafe66bc0c605daaa90) ex. mLeft mRight. If you want more keys just add more fields.
+keys => Keys the program should use
 
-displayKey1, displayKey2 - If the name of the key you are using is too large, or you would like to use a different symbol, you can use this property to override the original key name that is going to be displayed.
+they can be:
+* Keyboard (for numbers and symbols [please refer to this table](https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Keyboard.php#acb4cacd7cc5802dec45724cf3314a142)),
+* Mouse [mouse button options](https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Mouse.php#a4fb128be433f9aafe66bc0c605daaa90).
 
-keyCounter - yes/no - Adds a keycounter beneath each key that counts total clicks in a session.
+There should be several examples
 
-windowHeight, windowWidth - Used to change the resolution of the program.
+Hopefully the Config can be easily understood by everyone but if it isn't i'll try to write proper documentation on it
 
-keySize - Changes the size of the key (excluding border).
+## New Features
 
-barSpeed - Adjusts the speed at which the bars are travelling upwards.
+* Per-Key Color
+* Keycount saving
 
-margin - Adjusts the margin of the keys from the sides.
+## Known Issues
 
-outlineThickness - Changes the thickness of a square border
+* Hot reload not properly working (yet)
+* You Tell Me
 
-fading - yes/no - Adds/removes the fading effect on top 
+## Insomnya's note
 
-backgroundColor, keyColor, borderColor, barColor, fontColor - Changes the color of background (might be tricky, but possible to chroma key out in obs), key when not pressed, key border, bars and clicked key color, the font color using RGBA values.
+This is basically a BIG rewrite focused on trying to add features from several different branches.
 
-backgroundImage - Lets you set a background. Put the image into Resources directory and then put the filename into this property ex. "bg.png". Makes sure the background is the same resolution as your window and if you want transparency on your background you have to put the transparency on the image itself.
+I'm also trying to achive "hot-reloading" so you can change the config of the program and it updates the ui without needen to close and reopen it.
 
-maxFPS - Sets the target FPS for the program to run
+I'd like to sare this as ``MIT`` or ``ISC`` or ``Beerware`` bit it's sadly ``GNU GPL`` so i basically can't (Maybe in a future if i do a complete rewrite from scratch.)...
 
-rotation - Set font roration angle : support to -90/0/90
+However, the ConfigHelper is completly made by me and you can use it as ``MIT`` or ``ISC`` or ``Beerware``, the one you prefer.
 
-# GIF Preview
-
-![](https://puu.sh/ILKeQ/ade16628ca.gif)
-
-based on a similar app by an unknown author (if you are the author dm me so I can credit you)
-
+Have a great day!!
