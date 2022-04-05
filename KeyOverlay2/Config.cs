@@ -23,5 +23,9 @@ namespace KeyOverlay2
     {
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public GraphicsBackend? GraphicsBackend { get; set; } = null;
+        public bool Vsync { get; set; } = true;
+        public ushort Width { get; set; } = 600;
+        public ushort Height { get; set; } = 800;
+        public string WindowTitle { get; set; } = "KeyOverlay 2";
     }
 }

@@ -1,5 +1,7 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 using System.Text;
+using ImGuiNET;
 using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.SPIRV;
@@ -9,43 +11,54 @@ namespace KeyOverlay2
 {
     internal class MainWindow
     {
+        private readonly Stopwatch StopWatch = new Stopwatch();
+
         private readonly Sdl2Window Window;
         private readonly GraphicsDevice GraphicsDevice;
 
+        // Using a single command list to avoid weird render behaviour in screenshoots
         private CommandList CommandList;
+
         private DeviceBuffer VertexBuffer;
         private DeviceBuffer IndexBuffer;
-        private Shader[] _shaders;
+        private Shader[] Shaders;
         private Pipeline Pipeline;
 
-        private AppConfig AppConfig;
+        private readonly ImGuiRenderer ImguiRenderer;
+
+        private readonly AppConfig AppConfig;
 
         public MainWindow(AppConfig Config)
         {
             AppConfig = Config;
 
-            WindowCreateInfo windowCI = new WindowCreateInfo()
+            var WindowConfig = AppConfig.WindowConfig;
+
+            var windowCI = new WindowCreateInfo()
             {
                 X = 100,
                 Y = 100,
-                WindowWidth = 960,
-                WindowHeight = 540,
-                WindowTitle = "Veldrid Tutorial",
+                WindowWidth = WindowConfig.Width,
+                WindowHeight = WindowConfig.Height,
+                WindowTitle = WindowConfig.WindowTitle,
                 WindowInitialState = WindowState.Normal
             };
 
             Window = VeldridStartup.CreateWindow(ref windowCI);
 
-            GraphicsDeviceOptions options = new GraphicsDeviceOptions
+            var options = new GraphicsDeviceOptions()
             {
                 PreferStandardClipSpaceYDirection = true,
                 PreferDepthRangeZeroToOne = true,
-                SyncToVerticalBlank = false,
+                SyncToVerticalBlank = WindowConfig.Vsync,
             };
 
-            var GraphicsBackend = AppConfig.WindowConfig.GraphicsBackend ?? VeldridStartup.GetPlatformDefaultBackend();
+            var GraphicsBackend = WindowConfig.GraphicsBackend ?? VeldridStartup.GetPlatformDefaultBackend();
 
             GraphicsDevice = VeldridStartup.CreateGraphicsDevice(Window, options, GraphicsBackend);
+
+            ImguiRenderer = new ImGuiRenderer(GraphicsDevice, GraphicsDevice.MainSwapchain.Framebuffer.OutputDescription,
+            (int)GraphicsDevice.MainSwapchain.Framebuffer.Width, (int)GraphicsDevice.MainSwapchain.Framebuffer.Height);
 
             CreateResources();
         }
@@ -77,10 +90,10 @@ namespace KeyOverlay2
                 new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
                 new VertexElementDescription("Color", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Byte4_Norm));
 
-            ShaderDescription vertexShaderDesc = new ShaderDescription(ShaderStages.Vertex, Shaders.VertexCode, "main");
-            ShaderDescription fragmentShaderDesc = new ShaderDescription(ShaderStages.Fragment, Shaders.FragmentCode, "main");
+            ShaderDescription vertexShaderDesc = new ShaderDescription(ShaderStages.Vertex, KeyOverlay2.Shaders.VertexCode, "main");
+            ShaderDescription fragmentShaderDesc = new ShaderDescription(ShaderStages.Fragment, KeyOverlay2.Shaders.FragmentCode, "main");
 
-            _shaders = factory.CreateFromSpirv(vertexShaderDesc, fragmentShaderDesc);
+            Shaders = factory.CreateFromSpirv(vertexShaderDesc, fragmentShaderDesc);
 
             GraphicsPipelineDescription pipelineDescription = new GraphicsPipelineDescription();
             pipelineDescription.BlendState = BlendStateDescription.SingleAdditiveBlend;
@@ -98,7 +111,7 @@ namespace KeyOverlay2
 
             pipelineDescription.ResourceLayouts = Array.Empty<ResourceLayout>();
 
-            pipelineDescription.ShaderSet = new ShaderSetDescription(vertexLayouts: new VertexLayoutDescription[] { vertexLayout }, shaders: _shaders);
+            pipelineDescription.ShaderSet = new ShaderSetDescription(vertexLayouts: new VertexLayoutDescription[] { vertexLayout }, shaders: Shaders);
 
             pipelineDescription.Outputs = GraphicsDevice.SwapchainFramebuffer.OutputDescription;
 
@@ -107,22 +120,39 @@ namespace KeyOverlay2
             CommandList = factory.CreateCommandList();
         }
 
-        private void DrawBar()
-        {
-
-        }
-
-        private void DrawUi()
-        {
-
-        }
-
-        private void Draw()
+        private void DrawInternals(InputSnapshot input, float frameTime)
         {
             CommandList.Begin();
             CommandList.SetFramebuffer(GraphicsDevice.SwapchainFramebuffer);
             CommandList.ClearColorTarget(0, RgbaFloat.Black);
 
+            Draw(input, frameTime);
+
+            CommandList.End();
+            GraphicsDevice.SubmitCommands(CommandList);
+            GraphicsDevice.SwapBuffers(GraphicsDevice.MainSwapchain);
+        }
+
+        private void Draw(InputSnapshot input, float frameTime)
+        {
+            Settings(input, frameTime);
+            Content(input, frameTime);
+        }
+
+        private void Settings(InputSnapshot input, float frameTime)
+        {
+            ImguiRenderer.Update(frameTime, input);
+
+            // Draw stuff
+            ImGui.Text("Hello World");
+            ImGui.Text($"Backend => {GraphicsDevice.BackendType}");
+            ImGui.Text($"Frametime => {frameTime}");
+
+            ImguiRenderer.Render(GraphicsDevice, CommandList);
+        }
+
+        private void Content(InputSnapshot input, float frameTime)
+        {
             CommandList.SetVertexBuffer(0, VertexBuffer);
             CommandList.SetIndexBuffer(IndexBuffer, IndexFormat.UInt16);
             CommandList.SetPipeline(Pipeline);
@@ -132,22 +162,28 @@ namespace KeyOverlay2
                 indexStart: 0,
                 vertexOffset: 0,
                 instanceStart: 0);
-            CommandList.End();
-
-            GraphicsDevice.SubmitCommands(CommandList);
-            GraphicsDevice.SwapBuffers();
         }
 
         public void Start()
         {
             while (Window.Exists)
             {
-                Window.PumpEvents();
-                Draw();
+                var frameTime = Frametime();
+                var input = Window.PumpEvents();
+
+                DrawInternals(input, frameTime);                
             }
 
             DisposeResources();
         }
+
+        // Compute actual value for deltaSeconds.
+        private float Frametime()
+        {
+            var frametime = StopWatch.ElapsedMilliseconds / 1000f;
+            StopWatch.Restart();
+            return frametime;
+        } 
 
         private void DisposeResources()
         {
@@ -177,6 +213,7 @@ namespace KeyOverlay2
         public const uint SizeInBytes = 12;
     }
 
+#warning check if readonly struct fits better
     public static class Shaders
     {
         private static byte[] GetBytes(string input) => Encoding.UTF8.GetBytes(input);

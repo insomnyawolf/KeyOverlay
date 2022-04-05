@@ -1,8 +1,5 @@
 ﻿using ConfigHelper;
 using GitHelper;
-using Veldrid;
-using Veldrid.Sdl2;
-using Veldrid.StartupUtilities;
 
 namespace KeyOverlay2
 {
