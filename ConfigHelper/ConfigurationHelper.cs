@@ -9,18 +9,25 @@ namespace ConfigHelper
 {
     public class ConfigurationHelper<T> where T : class, new()
     {
-        private static readonly JsonSerializerOptions jsonSerializerOptions = new()
+        private static readonly JsonSerializerOptions JsonSerializerOptions;
+
+        static ConfigurationHelper()
         {
-            AllowTrailingCommas = true,
-            DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = JsonIgnoreCondition.Never,
-            IgnoreReadOnlyFields = true,
-            IgnoreReadOnlyProperties = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            ReadCommentHandling = JsonCommentHandling.Skip,
-            WriteIndented = true,
-            IncludeFields = true,
-        };
+            JsonSerializerOptions = new()
+            {
+                AllowTrailingCommas = true,
+                DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+                IgnoreReadOnlyFields = true,
+                IgnoreReadOnlyProperties = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                ReadCommentHandling = JsonCommentHandling.Skip,
+                WriteIndented = true,
+                IncludeFields = true,
+            };
+
+            JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        }
 
         public delegate void ConfigurationChanged();
         public event ConfigurationChanged OnConfigurationChanged;
@@ -52,8 +59,6 @@ namespace ConfigHelper
             FileStream = File.Open(ConfigFullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
 
             Logger?.LogInformation($"The config file will be => {ConfigFullPath}");
-
-            jsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             
             Load();
 
@@ -119,7 +124,7 @@ namespace ConfigHelper
             }
 
             FileStream.Position = 0;
-            Config = JsonSerializer.Deserialize<T>(FileStream, jsonSerializerOptions);
+            Config = JsonSerializer.Deserialize<T>(FileStream, JsonSerializerOptions);
 
             Semaphore.Release();
 
@@ -140,7 +145,7 @@ namespace ConfigHelper
             }
 
             FileStream.Position = 0;
-            JsonSerializer.Serialize(FileStream, Config, jsonSerializerOptions);
+            JsonSerializer.Serialize(FileStream, Config, JsonSerializerOptions);
             FileStream.Flush();
             FileStream.SetLength(FileStream.Position);
 

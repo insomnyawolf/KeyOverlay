@@ -7,26 +7,43 @@ namespace KeyOverlay2
 {
     public class KeyPressedArgs : EventArgs
     {
+        private static readonly JsonSerializerOptions JsonSerializerOptions;
+        static KeyPressedArgs()
+        {
+            JsonSerializerOptions = new()
+            {
+                AllowTrailingCommas = true,
+                DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+                IgnoreReadOnlyFields = false,
+                IgnoreReadOnlyProperties = false,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                ReadCommentHandling = JsonCommentHandling.Skip,
+                WriteIndented = true,
+                IncludeFields = true,
+            };
+
+            JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        }
+
         public Keys Key { get; private set; }
         public KeyEvents EventType { get; private set; }
         public bool Shift { get; private set; }
         public bool Ctrl { get; private set; }
         public bool Alt { get; private set; }
-        public bool Global { get; private set; }
 
-        internal KeyPressedArgs(Keys key, KeyEvents EventType, bool Shift, bool Ctrl, bool Alt, bool Global)
+        internal KeyPressedArgs(Keys key, KeyEvents EventType, bool Shift, bool Ctrl, bool Alt)
         {
             Key = key;
             this.Shift = Shift;
             this.Ctrl = Ctrl;
             this.Alt = Alt;
-            this.Global = Global;
             this.EventType = EventType;
         }
 
         public override string ToString()
         {
-            return JsonSerializer.Serialize(this);
+            return JsonSerializer.Serialize(this, options: JsonSerializerOptions);
         }
     }
 
@@ -120,11 +137,11 @@ namespace KeyOverlay2
 
                     if (keydownup == 0)
                     {
-                        OnKeyEvent?.Invoke(new KeyPressedArgs((Keys)W, KeyEvents.Down, GetShiftPressed(), GetCtrlPressed(), GetAltPressed(), Global));
+                        OnKeyEvent?.Invoke(new KeyPressedArgs((Keys)W, KeyEvents.Down, GetShiftPressed(), GetCtrlPressed(), GetAltPressed()));
                     }
                     if (keydownup == -1)
                     {
-                        OnKeyEvent?.Invoke(new KeyPressedArgs((Keys)W, KeyEvents.Up, GetShiftPressed(), GetCtrlPressed(), GetAltPressed(), Global));
+                        OnKeyEvent?.Invoke(new KeyPressedArgs((Keys)W, KeyEvents.Up, GetShiftPressed(), GetCtrlPressed(), GetAltPressed()));
                     }
                 }
                 else
@@ -133,11 +150,11 @@ namespace KeyOverlay2
                     var vkCode = Marshal.ReadInt32(L); //Leser vkCode som er de første 32 bits hvor L peker.
                     if (kEvent == RawKeyEvents.KeyDown || kEvent == RawKeyEvents.SKeyDown)
                     {
-                        OnKeyEvent?.Invoke(new KeyPressedArgs((Keys)vkCode, KeyEvents.Down, GetShiftPressed(), GetCtrlPressed(), GetAltPressed(), Global));
+                        OnKeyEvent?.Invoke(new KeyPressedArgs((Keys)vkCode, KeyEvents.Down, GetShiftPressed(), GetCtrlPressed(), GetAltPressed()));
                     }
                     if (kEvent == RawKeyEvents.KeyUp || kEvent == RawKeyEvents.SKeyUp)
                     {
-                        OnKeyEvent?.Invoke(new KeyPressedArgs((Keys)vkCode, KeyEvents.Up, GetShiftPressed(), GetCtrlPressed(), GetAltPressed(), Global));
+                        OnKeyEvent?.Invoke(new KeyPressedArgs((Keys)vkCode, KeyEvents.Up, GetShiftPressed(), GetCtrlPressed(), GetAltPressed()));
                     }
                 }
             }
