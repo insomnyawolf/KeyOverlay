@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using GitHelper;
+﻿using GitHelper;
 using Veldrid;
 
 namespace KeyOverlay2
@@ -21,7 +20,6 @@ namespace KeyOverlay2
 
     public class WindowConfig
     {
-        [JsonConverter(typeof(JsonStringEnumConverter))]
         public GraphicsBackend? GraphicsBackend { get; set; } = null;
         public bool Vsync { get; set; } = true;
         public ushort Width { get; set; } = 600;

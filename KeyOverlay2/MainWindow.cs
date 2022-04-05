@@ -3,60 +3,16 @@ using System.Numerics;
 using System.Text;
 using ImGuiNET;
 using Veldrid;
-using Veldrid.Sdl2;
 using Veldrid.SPIRV;
-using Veldrid.StartupUtilities;
 
 namespace KeyOverlay2
 {
-    internal class MainWindow
+    internal class MainWindow : BaseWindow
     {
-        private readonly Stopwatch StopWatch = new Stopwatch();
-
-        private readonly Sdl2Window Window;
-        private readonly GraphicsDevice GraphicsDevice;
-
-        // Using a single command list to avoid weird render behaviour in screenshoots
-        private CommandList CommandList;
-
-        private DeviceBuffer VertexBuffer;
-        private DeviceBuffer IndexBuffer;
-        private Shader[] Shaders;
-        private Pipeline Pipeline;
-
         private readonly ImGuiRenderer ImguiRenderer;
 
-        private readonly AppConfig AppConfig;
-
-        public MainWindow(AppConfig Config)
+        public MainWindow(AppConfig Config) : base(Config)
         {
-            AppConfig = Config;
-
-            var WindowConfig = AppConfig.WindowConfig;
-
-            var windowCI = new WindowCreateInfo()
-            {
-                X = 100,
-                Y = 100,
-                WindowWidth = WindowConfig.Width,
-                WindowHeight = WindowConfig.Height,
-                WindowTitle = WindowConfig.WindowTitle,
-                WindowInitialState = WindowState.Normal
-            };
-
-            Window = VeldridStartup.CreateWindow(ref windowCI);
-
-            var options = new GraphicsDeviceOptions()
-            {
-                PreferStandardClipSpaceYDirection = true,
-                PreferDepthRangeZeroToOne = true,
-                SyncToVerticalBlank = WindowConfig.Vsync,
-            };
-
-            var GraphicsBackend = WindowConfig.GraphicsBackend ?? VeldridStartup.GetPlatformDefaultBackend();
-
-            GraphicsDevice = VeldridStartup.CreateGraphicsDevice(Window, options, GraphicsBackend);
-
             ImguiRenderer = new ImGuiRenderer(GraphicsDevice, GraphicsDevice.MainSwapchain.Framebuffer.OutputDescription,
             (int)GraphicsDevice.MainSwapchain.Framebuffer.Width, (int)GraphicsDevice.MainSwapchain.Framebuffer.Height);
 
@@ -120,78 +76,44 @@ namespace KeyOverlay2
             CommandList = factory.CreateCommandList();
         }
 
-        private void DrawInternals(InputSnapshot input, float frameTime)
+        internal override void Update(InputSnapshot input, float deltaTime)
         {
-            CommandList.Begin();
-            CommandList.SetFramebuffer(GraphicsDevice.SwapchainFramebuffer);
-            CommandList.ClearColorTarget(0, RgbaFloat.Black);
-
-            Draw(input, frameTime);
-
-            CommandList.End();
-            GraphicsDevice.SubmitCommands(CommandList);
-            GraphicsDevice.SwapBuffers(GraphicsDevice.MainSwapchain);
+            Settings(input, deltaTime);
+            Content(input, deltaTime);
         }
 
-        private void Draw(InputSnapshot input, float frameTime)
+        private void Settings(InputSnapshot input, float deltaTime)
         {
-            Settings(input, frameTime);
-            Content(input, frameTime);
-        }
-
-        private void Settings(InputSnapshot input, float frameTime)
-        {
-            ImguiRenderer.Update(frameTime, input);
+            ImguiRenderer.Update(deltaTime, input);
 
             // Draw stuff
             ImGui.Text("Hello World");
             ImGui.Text($"Backend => {GraphicsDevice.BackendType}");
-            ImGui.Text($"Frametime => {frameTime}");
+            ImGui.Text($"Frametime => {deltaTime}");
 
             ImguiRenderer.Render(GraphicsDevice, CommandList);
         }
 
-        private void Content(InputSnapshot input, float frameTime)
+        private int vertexOffset = 0;
+
+        private void Content(InputSnapshot input, float deltaTime)
         {
             CommandList.SetVertexBuffer(0, VertexBuffer);
             CommandList.SetIndexBuffer(IndexBuffer, IndexFormat.UInt16);
             CommandList.SetPipeline(Pipeline);
-            CommandList.DrawIndexed(
-                indexCount: 4,
-                instanceCount: 1,
-                indexStart: 0,
-                vertexOffset: 0,
-                instanceStart: 0);
-        }
 
-        public void Start()
-        {
-            while (Window.Exists)
+            for (int i = 0; i < input.KeyEvents.Count; i++)
             {
-                var frameTime = Frametime();
-                var input = Window.PumpEvents();
+                var @event = input.KeyEvents[i];
 
-                DrawInternals(input, frameTime);                
+                if(@event.Key == Key.Space)
+                {
+                    vertexOffset++;
+                    Console.WriteLine(vertexOffset);
+                }
             }
 
-            DisposeResources();
-        }
-
-        // Compute actual value for deltaSeconds.
-        private float Frametime()
-        {
-            var frametime = StopWatch.ElapsedMilliseconds / 1000f;
-            StopWatch.Restart();
-            return frametime;
-        } 
-
-        private void DisposeResources()
-        {
-            Pipeline.Dispose();
-            CommandList.Dispose();
-            VertexBuffer.Dispose();
-            IndexBuffer.Dispose();
-            GraphicsDevice.Dispose();
+            CommandList.DrawIndexed(indexCount: 4, instanceCount: 1, indexStart: 0, vertexOffset: vertexOffset, instanceStart: 0);
         }
     }
 

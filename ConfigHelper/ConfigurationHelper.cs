@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
-using System.ComponentModel;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 
 namespace ConfigHelper
@@ -13,7 +13,7 @@ namespace ConfigHelper
         {
             AllowTrailingCommas = true,
             DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never,
+            DefaultIgnoreCondition = JsonIgnoreCondition.Never,
             IgnoreReadOnlyFields = true,
             IgnoreReadOnlyProperties = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -53,6 +53,8 @@ namespace ConfigHelper
 
             Logger?.LogInformation($"The config file will be => {ConfigFullPath}");
 
+            jsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            
             Load();
 
             FileWatch();
@@ -115,7 +117,6 @@ namespace ConfigHelper
                 Semaphore.Release();
                 Save();
             }
-
 
             FileStream.Position = 0;
             Config = JsonSerializer.Deserialize<T>(FileStream, jsonSerializerOptions);

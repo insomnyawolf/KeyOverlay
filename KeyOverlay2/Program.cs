@@ -11,6 +11,9 @@ namespace KeyOverlay2
 
         private static void Main()
         {
+
+            var inputs = new LowLevelInputHook(true);
+
             var helper = new GitHelpers(Config.GitHelpersConfig);
 
             // Will help people opening issues for unhandled exceptions
