@@ -13,16 +13,19 @@ namespace KeyOverlay
         public ushort Height { get; set; } = 700;
         public byte KeySize { get; set; } = 125;
         public byte KeySpacing { get; set; } = 1;
-        public ushort Margin { get; set; } = 100;
+        public ushort Margin { get; set; } = 30;
         public ushort MaxFps { get; set; } = 60;
         public int BarSpeed { get; set; } = 600;
         public int OutLineThickness { get; set; } = 5;
         public string BackgroundImage { get; set; } = null;
 #if RELEASE
         [JsonIgnore]
-#endif
         // It's broken and crash the program, idk why
         public bool Fade { get; set; } = false;
+
+#else
+        public bool Fade { get; set; } = true;
+#endif
         public bool HitCount { get; set; } = true;
         public byte TextRotation { get; set; } = 0;
         public Color BackgroundColor { get; set; } = Color.Black;
