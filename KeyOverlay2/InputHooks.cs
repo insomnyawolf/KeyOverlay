@@ -39,22 +39,12 @@ namespace KeyOverlay2
 
     public class LowLevelInputHook : IDisposable
     {
-        private bool Global = false;
-        public delegate void KeyEvent(KeyPressedArgs @event);
+        private readonly bool Global;
 
+        public delegate void KeyEvent(KeyPressedArgs @event);
         public event KeyEvent OnKeyEvent;
 
-        public delegate int CallbackDelegate(int Code, IntPtr W, IntPtr L);
-
-        //[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-        //public struct KBDLLHookStruct
-        //{
-        //    public Int32 vkCode;
-        //    public Int32 scanCode;
-        //    public Int32 flags;
-        //    public Int32 time;
-        //    public Int32 dwExtraInfo;
-        //}
+        private delegate int CallbackDelegate(int Code, IntPtr W, IntPtr L);
 
         [DllImport("user32", CallingConvention = CallingConvention.StdCall)]
         private static extern int SetWindowsHookEx(HookType idHook, CallbackDelegate lpfn, int hInstance, int threadId);
@@ -64,7 +54,10 @@ namespace KeyOverlay2
         private static extern int CallNextHookEx(int idHook, int nCode, IntPtr wParam, IntPtr lParam);
         [DllImport("kernel32.dll", CallingConvention = CallingConvention.StdCall)]
         private static extern int GetCurrentThreadId();
-        public enum HookType : int
+        [DllImport("user32.dll")]
+        private static extern short GetKeyState(Keys nVirtKey);
+
+        private enum HookType : int
         {
             WH_JOURNALRECORD = 0,
             WH_JOURNALPLAYBACK = 1,
@@ -82,8 +75,8 @@ namespace KeyOverlay2
             WH_KEYBOARD_LL = 13,
             WH_MOUSE_LL = 14
         }
-        private int HookID = 0;
-        private CallbackDelegate HookCallBack = null;
+        private readonly int HookID;
+        private readonly CallbackDelegate OnHookCallBack;
 
         //Start hook
         public LowLevelInputHook(bool Global)
@@ -96,16 +89,16 @@ namespace KeyOverlay2
 #endif
 
             this.Global = Global;
-            HookCallBack = new CallbackDelegate(KeybHookProc);
+            OnHookCallBack = new CallbackDelegate(KeybHookProc);
             if (Global)
             {
-                HookID = SetWindowsHookEx(HookType.WH_KEYBOARD_LL, HookCallBack,
+                HookID = SetWindowsHookEx(HookType.WH_KEYBOARD_LL, OnHookCallBack,
                     0, //0 for local hook. eller hwnd til user32 for global
                     0); //0 for global hook. eller thread for hooken
             }
             else
             {
-                HookID = SetWindowsHookEx(HookType.WH_KEYBOARD, HookCallBack,
+                HookID = SetWindowsHookEx(HookType.WH_KEYBOARD, OnHookCallBack,
                     0, //0 for local hook. or hwnd to user32 for global
                     GetCurrentThreadId()); //0 for global hook. or thread for the hook
             }
@@ -124,8 +117,6 @@ namespace KeyOverlay2
                 if (!Global)
                 {
                     int keydownup = Marshal.ReadInt32(L) >> 30;
-
-                    Console.WriteLine($"Code => {Code}\nW => {W}\nL => {L}");
 
                     if (keydownup == 0)
                     {
@@ -150,9 +141,13 @@ namespace KeyOverlay2
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 //Ignore all errors...
+#warning shall we really?
+#if DEBUG
+                throw;
+#endif
             }
             return CallNextHookEx(HookID, Code, W, L);
         }
@@ -165,8 +160,6 @@ namespace KeyOverlay2
             SKeyUp = 0x0105
         }
 
-        [DllImport("user32.dll")]
-        static public extern short GetKeyState(Keys nVirtKey);
         public static bool GetCapslock()
         {
             return Convert.ToBoolean(GetKeyState(Keys.CapsLock)) & true;
@@ -209,6 +202,8 @@ namespace KeyOverlay2
 
             return false;
         }
+
+        // Destructor
 
         bool IsFinalized = false;
         ~LowLevelInputHook()

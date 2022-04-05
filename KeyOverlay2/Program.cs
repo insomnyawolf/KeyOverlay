@@ -12,7 +12,7 @@ namespace KeyOverlay2
         private static void Main()
         {
 
-            var inputs = new LowLevelInputHook(true);
+            using var inputs = new LowLevelInputHook(true);
 
             var helper = new GitHelpers(Config.GitHelpersConfig);
 
