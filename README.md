@@ -2,7 +2,10 @@
 # KeyOverlay
  A simple multipropouse key overlay (pss, works for osu! too)
 
-# [Download Link](https://github.com/insomnyawolf/KeyOverlay/releases/)
+# [Old Version Download Link](https://github.com/insomnyawolf/KeyOverlay/releases/)
+
+New version is not ready yet
+
 IF YOU ARE HAVING PROBLEMS WITH FULLSCREEN, TRY USING GAME CAPTURE INSTEAD OF WINDOW CAPTURE IN OBS!
 
 ## Insomnya's note
