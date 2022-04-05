@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace KeyOverlay2
 {
+    // Based on https://stackoverflow.com/questions/46013287/c-sharp-global-keyboard-hook-that-opens-a-form-from-a-console-application
     public class KeyPressedArgs : EventArgs
     {
         private static readonly JsonSerializerOptions JsonSerializerOptions;
@@ -47,7 +48,6 @@ namespace KeyOverlay2
         }
     }
 
-    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum KeyEvents
     {
         Down,
@@ -221,7 +221,6 @@ namespace KeyOverlay2
         }
 
         // Destructor
-
         bool IsFinalized = false;
         ~LowLevelInputHook()
         {
@@ -240,17 +239,17 @@ namespace KeyOverlay2
             }
         }
     }
+
+    // Referenced from https://referencesource.microsoft.com/#System.Windows.Forms/winforms/Managed/System/WinForms/Keys.cs to avoid dependences on winforms
+
     //------------------------------------------------------------------------------
     // <copyright file="Keys.cs" company="Microsoft">
     //     Copyright (c) Microsoft Corporation.  All rights reserved.
     // </copyright>                                                                
     //------------------------------------------------------------------------------
-    [Flags]
+
     // Certain memberd of Keys enum are actually meant to be OR'ed.
-    [SuppressMessage("Microsoft.Usage", "CA2217:DoNotMarkEnumsWithFlags")]
-    [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-    // To ease debugging
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [Flags]
     public enum Keys
     {
         KeyCode = 0x0000FFFF,
