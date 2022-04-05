@@ -133,13 +133,13 @@ namespace KeyOverlay2
             {
                 if (!Global)
                 {
-                    int keydownup = Marshal.ReadInt32(L) >> 30;
+                    var keydownup = L.ToInt64() >> 30;
 
                     if (keydownup == 0)
                     {
                         OnKeyEvent?.Invoke(new KeyPressedArgs((Keys)W, KeyEvents.Down, GetShiftPressed(), GetCtrlPressed(), GetAltPressed()));
                     }
-                    if (keydownup == -1)
+                    if (keydownup == 3)
                     {
                         OnKeyEvent?.Invoke(new KeyPressedArgs((Keys)W, KeyEvents.Up, GetShiftPressed(), GetCtrlPressed(), GetAltPressed()));
                     }
