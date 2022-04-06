@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace LowLevelInputHooks
 {
@@ -111,11 +110,11 @@ namespace LowLevelInputHooks
 
                     if (keydownup == 0)
                     {
-                        input.KeyEvent = new KeyEvent((Keys)W, InputType.Down, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
+                        input.KeyEvent = new KeyEvent((Keys)W, InputAction.Down, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
                     }
                     if (keydownup == 3)
                     {
-                        input.KeyEvent = new KeyEvent((Keys)W, InputType.Up, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
+                        input.KeyEvent = new KeyEvent((Keys)W, InputAction.Up, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
                     }
                 }
                 else
@@ -127,11 +126,11 @@ namespace LowLevelInputHooks
 
                     if (kEvent == RawKeyEvents.KeyDown || kEvent == RawKeyEvents.SKeyDown)
                     {
-                        input.KeyEvent = new KeyEvent((Keys)vkCode, InputType.Down, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
+                        input.KeyEvent = new KeyEvent((Keys)vkCode, InputAction.Down, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
                     }
                     if (kEvent == RawKeyEvents.KeyUp || kEvent == RawKeyEvents.SKeyUp)
                     {
-                        input.KeyEvent = new KeyEvent((Keys)vkCode, InputType.Up, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
+                        input.KeyEvent = new KeyEvent((Keys)vkCode, InputAction.Up, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
                     }
                 }
 
@@ -200,10 +199,14 @@ namespace LowLevelInputHooks
             {
                 return CallNextHookEx(MouseHookID, Code, W, L);
             }
+
+            var str = new MsllHookStruct();
+            Marshal.PtrToStructure(L, str);
+
             var input = new InputEvent()
             {
                 InputOrigin = InputOrigin.Mouse,
-                MouseEvent = new MouseEvent((MouseMessage)W, GetMousePosition())
+                MouseEvent = new MouseEvent((MouseMessage)W, str)
             };
 
             OnKeyEvent?.Invoke(input);
@@ -244,5 +247,23 @@ namespace LowLevelInputHooks
                 IsFinalized = true;
             }
         }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal class MsllHookStruct
+    {
+        public Point pt;
+        public uint mouseData;
+        public uint flags;
+        public uint time;
+        public IntPtr dwExtraInfo;
+        public int WheelDelta;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class Point
+    {
+        public int x;
+        public int y;
     }
 }

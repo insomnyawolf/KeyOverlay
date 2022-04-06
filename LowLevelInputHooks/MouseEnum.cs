@@ -1,5 +1,15 @@
 ﻿namespace LowLevelInputHooks
 {
+    public enum MouseButton
+    {
+        None,
+        Left,
+        Right,
+        Middle,
+        Scroll,
+        WheelB,
+    }
+
     public enum MouseMessage
     {
         WM_MOUSEMOVE = 0x0200,
