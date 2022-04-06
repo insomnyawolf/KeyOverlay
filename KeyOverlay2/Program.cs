@@ -7,7 +7,7 @@ namespace KeyOverlay2
     public static class Program
     {
         public static readonly string ProgramLocation = AppContext.BaseDirectory;
-        public static readonly LowLevelInputHook LowLevelGlobalInputHook = new(Global: true);
+        public static readonly LowLevelInputHook LowLevelGlobalInputHook = new(Global: false);
         public static readonly ConfigurationHelper<Config> ConfigHelper = new(Path.Combine(ProgramLocation, "./config.json"));
         private static Config Config => ConfigHelper.Config;
 

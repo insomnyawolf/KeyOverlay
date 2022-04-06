@@ -20,7 +20,10 @@ namespace KeyOverlay2
 
     public class WindowConfig
     {
-        public GraphicsBackend? GraphicsBackend { get; set; } = null;
+        //public GraphicsBackend? GraphicsBackend { get; set; } = null;
+
+        // Personal preference for development
+        public GraphicsBackend? GraphicsBackend { get; set; } = Veldrid.GraphicsBackend.Vulkan;
         public bool Vsync { get; set; } = true;
         public ushort Width { get; set; } = 600;
         public ushort Height { get; set; } = 800;

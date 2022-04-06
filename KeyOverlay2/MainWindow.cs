@@ -1,9 +1,12 @@
 ﻿using System.Numerics;
 using System.Text;
 using ImGuiNET;
+using KeyOverlay2.Helpers;
+using KeyOverlay2.Shapes;
 using LowLevelInputHooks;
 using Veldrid;
 using Veldrid.SPIRV;
+using Point = KeyOverlay2.Helpers.Point;
 
 namespace KeyOverlay2
 {
@@ -16,71 +19,27 @@ namespace KeyOverlay2
             ImguiRenderer = new ImGuiRenderer(GraphicsDevice, GraphicsDevice.MainSwapchain.Framebuffer.OutputDescription,
             (int)GraphicsDevice.MainSwapchain.Framebuffer.Width, (int)GraphicsDevice.MainSwapchain.Framebuffer.Height);
 
-            CreateResources();
-
             lowLevelInput.OnKeyEvent += HandleInput;
+
+            CreateResources();
         }
 
+        private List<VeldridViewportItem> veldridViewportItems = new List<VeldridViewportItem>();
         private void CreateResources()
         {
-            ResourceFactory factory = GraphicsDevice.ResourceFactory;
-
-            var red = RgbaByte.Red;
-            var fadingRed = new RgbaByte(0, 0, 255, 0);
-
-            VertexPositionColor[] quadVertices =
-            {
-                new VertexPositionColor(new Vector2(-0.75f, 0.75f), fadingRed),
-                new VertexPositionColor(new Vector2(0.75f, 0.75f), fadingRed),
-                new VertexPositionColor(new Vector2(-0.75f, -0.75f), red),
-                new VertexPositionColor(new Vector2(0.75f, -0.75f), red)
-            };
-
-            ushort[] quadIndices = { 0, 1, 2, 3 };
-
-            VertexBuffer = factory.CreateBuffer(new BufferDescription(4 * VertexPositionColor.SizeInBytes, BufferUsage.VertexBuffer));
-            IndexBuffer = factory.CreateBuffer(new BufferDescription(4 * sizeof(ushort), BufferUsage.IndexBuffer));
-
-            GraphicsDevice.UpdateBuffer(VertexBuffer, 0, quadVertices);
-            GraphicsDevice.UpdateBuffer(IndexBuffer, 0, quadIndices);
-
-            VertexLayoutDescription vertexLayout = new VertexLayoutDescription(
-                new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
-                new VertexElementDescription("Color", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Byte4_Norm));
-
             ShaderDescription vertexShaderDesc = new ShaderDescription(ShaderStages.Vertex, KeyOverlay2.Shaders.VertexCode, "main");
             ShaderDescription fragmentShaderDesc = new ShaderDescription(ShaderStages.Fragment, KeyOverlay2.Shaders.FragmentCode, "main");
 
-            Shaders = factory.CreateFromSpirv(vertexShaderDesc, fragmentShaderDesc);
+            Shaders = ResourceFactory.CreateFromSpirv(vertexShaderDesc, fragmentShaderDesc);
 
-            GraphicsPipelineDescription pipelineDescription = new GraphicsPipelineDescription();
-            pipelineDescription.BlendState = BlendStateDescription.SingleAdditiveBlend;
+            veldridViewportItems.Add(new Square(this, new Point { X = 0, Y = 0 }, new Size { X = 95, Y = 95 }, RgbaByte.Orange));
 
-            pipelineDescription.DepthStencilState = new DepthStencilStateDescription(depthTestEnabled: true, depthWriteEnabled: true, comparisonKind: ComparisonKind.LessEqual);
-
-            pipelineDescription.RasterizerState = new RasterizerStateDescription(
-                cullMode: FaceCullMode.Back,
-                fillMode: PolygonFillMode.Solid,
-                frontFace: FrontFace.Clockwise,
-                depthClipEnabled: true,
-                scissorTestEnabled: false);
-
-            pipelineDescription.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
-
-            pipelineDescription.ResourceLayouts = Array.Empty<ResourceLayout>();
-
-            pipelineDescription.ShaderSet = new ShaderSetDescription(vertexLayouts: new VertexLayoutDescription[] { vertexLayout }, shaders: Shaders);
-
-            pipelineDescription.Outputs = GraphicsDevice.SwapchainFramebuffer.OutputDescription;
-
-            Pipeline = factory.CreateGraphicsPipeline(pipelineDescription);
-
-            CommandList = factory.CreateCommandList();
+            veldridViewportItems.Add(new Square(this, new Point { X = 25, Y = 25 }, new Size { X = 15, Y = 15 }, RgbaByte.Blue));
         }
 
         private void HandleInput(InputEvent @event)
         {
-            if(@event.InputOrigin == InputOrigin.Keyboard)
+            if (@event.InputOrigin == InputOrigin.Keyboard)
             {
 
             }
@@ -92,11 +51,11 @@ namespace KeyOverlay2
 
         internal override void Update(InputSnapshot input, float deltaTime)
         {
-            Settings(input, deltaTime);
             Content(input, deltaTime);
+            ImGuiMenus(input, deltaTime);
         }
 
-        private void Settings(InputSnapshot input, float deltaTime)
+        private void ImGuiMenus(InputSnapshot input, float deltaTime)
         {
             ImguiRenderer.Update(deltaTime, input);
 
@@ -108,26 +67,12 @@ namespace KeyOverlay2
             ImguiRenderer.Render(GraphicsDevice, CommandList);
         }
 
-        private int vertexOffset = 0;
-
         private void Content(InputSnapshot _, float deltaTime)
         {
-            CommandList.SetVertexBuffer(0, VertexBuffer);
-            CommandList.SetIndexBuffer(IndexBuffer, IndexFormat.UInt16);
-            CommandList.SetPipeline(Pipeline);
-
-            //for (int i = 0; i < input.KeyEvents.Count; i++)
-            //{
-            //    var @event = input.KeyEvents[i];
-
-            //    if(@event.Key == Key.Space)
-            //    {
-            //        vertexOffset++;
-            //        Console.WriteLine(vertexOffset);
-            //    }
-            //}
-
-            CommandList.DrawIndexed(indexCount: 4, instanceCount: 1, indexStart: 0, vertexOffset: vertexOffset, instanceStart: 0);
+            for (int i = 0; i < veldridViewportItems.Count; i++)
+            {
+                veldridViewportItems[i].Draw();
+            }
         }
     }
 
@@ -138,7 +83,7 @@ namespace KeyOverlay2
         public Vector2 Position;
 
         // This is the color of the vertex.
-        public RgbaByte Color; 
+        public RgbaByte Color;
         public VertexPositionColor(Vector2 position, RgbaByte color)
         {
             Position = position;

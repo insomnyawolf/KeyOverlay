@@ -39,3 +39,7 @@ This is harder than i expected D:
 * Basic Output
 * Imgui Render (to prepare live controls \\:D/)
 * Global Keyboar Event Listener (Windows only for now)
+
+## Known Issues
+
+* Keeping pressed keys on keyboard returns unknown event

@@ -11,14 +11,12 @@ namespace KeyOverlay2
 
         internal readonly Sdl2Window Window;
         internal readonly GraphicsDevice GraphicsDevice;
+        internal readonly ResourceFactory ResourceFactory;
 
         // Using a single command list to avoid weird render behaviour in screenshoots
-        internal CommandList CommandList;
+        internal readonly CommandList CommandList;
 
-        internal DeviceBuffer VertexBuffer;
-        internal DeviceBuffer IndexBuffer;
         internal Shader[] Shaders;
-        internal Pipeline Pipeline;
 
         internal readonly AppConfig AppConfig;
 
@@ -30,7 +28,7 @@ namespace KeyOverlay2
 
             var windowCI = new WindowCreateInfo()
             {
-                X = 100,
+                X = -800,
                 Y = 100,
                 WindowWidth = WindowConfig.Width,
                 WindowHeight = WindowConfig.Height,
@@ -50,11 +48,16 @@ namespace KeyOverlay2
             var GraphicsBackend = WindowConfig.GraphicsBackend ?? VeldridStartup.GetPlatformDefaultBackend();
 
             GraphicsDevice = VeldridStartup.CreateGraphicsDevice(Window, options, GraphicsBackend);
+
+            ResourceFactory = GraphicsDevice.ResourceFactory;
+
+            CommandList = ResourceFactory.CreateCommandList();
         }
 
         private void DrawInternals(InputSnapshot input, float deltaTime)
         {
             CommandList.Begin();
+            
             CommandList.SetFramebuffer(GraphicsDevice.SwapchainFramebuffer);
             CommandList.ClearColorTarget(0, RgbaFloat.Black);
 
@@ -62,7 +65,14 @@ namespace KeyOverlay2
 
             CommandList.End();
             GraphicsDevice.SubmitCommands(CommandList);
-            GraphicsDevice.SwapBuffers(GraphicsDevice.MainSwapchain);
+            try
+            {
+                GraphicsDevice.SwapBuffers(/*GraphicsDevice.MainSwapchain*/);
+            }
+            catch(VeldridException ex)
+            {
+
+            }
         }
 
         internal abstract void Update(InputSnapshot input, float deltaTime);
@@ -73,7 +83,7 @@ namespace KeyOverlay2
             {
                 var deltaTime = Frametime();
                 var input = Window.PumpEvents();
-                DrawInternals(input, deltaTime);                
+                DrawInternals(input, deltaTime);
             }
 
             DisposeResources();
@@ -85,14 +95,11 @@ namespace KeyOverlay2
             var frametime = StopWatch.ElapsedMilliseconds / 1000f;
             StopWatch.Restart();
             return frametime;
-        } 
+        }
 
         private void DisposeResources()
         {
-            Pipeline.Dispose();
             CommandList.Dispose();
-            VertexBuffer.Dispose();
-            IndexBuffer.Dispose();
             GraphicsDevice.Dispose();
         }
     }
