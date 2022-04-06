@@ -73,7 +73,6 @@ namespace KeyOverlay2
             {
                 var deltaTime = Frametime();
                 var input = Window.PumpEvents();
-
                 DrawInternals(input, deltaTime);                
             }
 

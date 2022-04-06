@@ -25,6 +25,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ConfigHelper\ConfigHelper.csproj" />
     <ProjectReference Include="..\GitHelper\GitHelper.csproj" />
+    <ProjectReference Include="..\LowLevelInputHooks\LowLevelInputHooks.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Text;
 using ImGuiNET;
+using LowLevelInputHooks;
 using Veldrid;
 using Veldrid.SPIRV;
 
@@ -11,12 +11,14 @@ namespace KeyOverlay2
     {
         private readonly ImGuiRenderer ImguiRenderer;
 
-        public MainWindow(AppConfig Config) : base(Config)
+        public MainWindow(AppConfig Config, LowLevelInputHook lowLevelInput) : base(Config)
         {
             ImguiRenderer = new ImGuiRenderer(GraphicsDevice, GraphicsDevice.MainSwapchain.Framebuffer.OutputDescription,
             (int)GraphicsDevice.MainSwapchain.Framebuffer.Width, (int)GraphicsDevice.MainSwapchain.Framebuffer.Height);
 
             CreateResources();
+
+            lowLevelInput.OnKeyEvent += HandleInput;
         }
 
         private void CreateResources()
@@ -76,6 +78,18 @@ namespace KeyOverlay2
             CommandList = factory.CreateCommandList();
         }
 
+        private void HandleInput(InputEvent @event)
+        {
+            if(@event.InputOrigin == InputOrigin.Keyboard)
+            {
+
+            }
+            else if (@event.InputOrigin == InputOrigin.Mouse)
+            {
+
+            }
+        }
+
         internal override void Update(InputSnapshot input, float deltaTime)
         {
             Settings(input, deltaTime);
@@ -96,22 +110,22 @@ namespace KeyOverlay2
 
         private int vertexOffset = 0;
 
-        private void Content(InputSnapshot input, float deltaTime)
+        private void Content(InputSnapshot _, float deltaTime)
         {
             CommandList.SetVertexBuffer(0, VertexBuffer);
             CommandList.SetIndexBuffer(IndexBuffer, IndexFormat.UInt16);
             CommandList.SetPipeline(Pipeline);
 
-            for (int i = 0; i < input.KeyEvents.Count; i++)
-            {
-                var @event = input.KeyEvents[i];
+            //for (int i = 0; i < input.KeyEvents.Count; i++)
+            //{
+            //    var @event = input.KeyEvents[i];
 
-                if(@event.Key == Key.Space)
-                {
-                    vertexOffset++;
-                    Console.WriteLine(vertexOffset);
-                }
-            }
+            //    if(@event.Key == Key.Space)
+            //    {
+            //        vertexOffset++;
+            //        Console.WriteLine(vertexOffset);
+            //    }
+            //}
 
             CommandList.DrawIndexed(indexCount: 4, instanceCount: 1, indexStart: 0, vertexOffset: vertexOffset, instanceStart: 0);
         }

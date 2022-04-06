@@ -1,5 +1,6 @@
 ﻿using ConfigHelper;
 using GitHelper;
+using LowLevelInputHooks;
 
 namespace KeyOverlay2
 {
@@ -24,7 +25,7 @@ namespace KeyOverlay2
 
         private static void Run()
         {
-            var window = new MainWindow(Config.AppConfig);
+            var window = new MainWindow(Config.AppConfig, LowLevelGlobalInputHook);
             window.Start();
         }
     }
