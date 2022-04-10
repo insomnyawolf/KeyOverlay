@@ -6,7 +6,6 @@ using KeyOverlay2.Shapes;
 using LowLevelInputHooks;
 using Veldrid;
 using Veldrid.SPIRV;
-using Point = KeyOverlay2.Helpers.Point;
 
 namespace KeyOverlay2
 {
@@ -24,7 +23,10 @@ namespace KeyOverlay2
             CreateResources();
         }
 
-        private List<VeldridViewportItem> veldridViewportItems = new List<VeldridViewportItem>();
+        public Rect RectA { get; set; }
+        public Rect RectB { get; set; }
+        public Rect CentA { get; set; }
+
         private void CreateResources()
         {
             ShaderDescription vertexShaderDesc = new ShaderDescription(ShaderStages.Vertex, KeyOverlay2.Shaders.VertexCode, "main");
@@ -32,9 +34,16 @@ namespace KeyOverlay2
 
             Shaders = ResourceFactory.CreateFromSpirv(vertexShaderDesc, fragmentShaderDesc);
 
-            veldridViewportItems.Add(new Square(this, new Point { X = 0, Y = 0 }, new Size { X = 95, Y = 95 }, RgbaByte.Orange));
+            //var veldridPointA = PublicHelpers.GetPointAtDefinedPercentages(10, 30);
 
-            veldridViewportItems.Add(new Square(this, new Point { X = 25, Y = 25 }, new Size { X = 15, Y = 15 }, RgbaByte.Blue));
+            //RectA = new Rect(this, veldridPointA, new Vector2 { X = 0.5f, Y = 1f }, RgbaByte.Orange);
+
+            //CentA = new Rect(this, RectA.GetCenter(), new Vector2 { X = 0.01f, Y = 0.01f }, RgbaByte.Red);
+
+            //var veldridPointB = PublicHelpers.GetPointAtDefinedPercentages(30, 30);
+
+            //RectB = new Rect(this, veldridPointB, new Vector2 { X = 1f, Y = 1f }, RgbaByte.Blue);
+            RectB = new Rect(this, new Vector2 { X = -1f, Y = -0.5f }, new Vector2 { X = 1f, Y = 1f }, RgbaByte.Blue);
         }
 
         private void HandleInput(InputEvent @event)
@@ -52,7 +61,7 @@ namespace KeyOverlay2
         internal override void Update(InputSnapshot input, float deltaTime)
         {
             Content(input, deltaTime);
-            ImGuiMenus(input, deltaTime);
+            //ImGuiMenus(input, deltaTime);
         }
 
         private void ImGuiMenus(InputSnapshot input, float deltaTime)
@@ -67,31 +76,45 @@ namespace KeyOverlay2
             ImguiRenderer.Render(GraphicsDevice, CommandList);
         }
 
-        private void Content(InputSnapshot _, float deltaTime)
+        float curentRotation = 0;
+        private void Content(InputSnapshot test, float deltaTime)
         {
-            for (int i = 0; i < veldridViewportItems.Count; i++)
+            //RectA.Draw();
+            //CentA.Draw();
+            
+            curentRotation += 10 * deltaTime;
+            RectB.Rotate(curentRotation);
+
+            var movement = Vector2.Zero;
+
+            for (int i = 0; i < test.KeyEvents.Count; i++)
             {
-                veldridViewportItems[i].Draw();
+                var current = test.KeyEvents[i];
+
+                if (current.Key == Key.Up && current.Down)
+                {
+                    movement.Y++;
+                }
+
+                if (current.Key == Key.Down && current.Down)
+                {
+                    movement.Y--;
+                }
+
+                if (current.Key == Key.Right && current.Down)
+                {
+                    movement.X++;
+                }
+
+                if (current.Key == Key.Left && current.Down)
+                {
+                    movement.X--;
+                }
             }
+            RectB.Translate(movement * deltaTime);
+
+            RectB.Draw();
         }
-    }
-
-    struct VertexPositionColor
-    {
-        // This is the position, in normalized device coordinates.
-        // Tldr where will be the things be relative to the window
-        public Vector2 Position;
-
-        // This is the color of the vertex.
-        public RgbaByte Color;
-        public VertexPositionColor(Vector2 position, RgbaByte color)
-        {
-            Position = position;
-            Color = color;
-        }
-
-        //Don't ask me how this is calculated, i'm confused as well
-        public const uint SizeInBytes = 12;
     }
 
 #warning check if readonly struct fits better

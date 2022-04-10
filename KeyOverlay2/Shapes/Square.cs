@@ -4,38 +4,45 @@ using Veldrid;
 
 namespace KeyOverlay2.Shapes
 {
-    internal class Square : VeldridViewportItem
+    internal class Rect : Shape
     {
-        public ushort[] Indices => new ushort[] { 0, 1, 2, 3 };
-        public VertexPositionColor[] Vertices { get; private set; } = new VertexPositionColor[4];
-        public uint VerticesLength => (uint)Vertices.Length;
-
+        private readonly Vector2 HalfSize;
         private DeviceBuffer VertexBuffer;
         private DeviceBuffer IndexBuffer;
 
-        public Square(BaseWindow Window, Helpers.Point Position, Size Size, RgbaByte Color) : base(Window)
+        public Rect(BaseWindow Window, Vector2 Position, Vector2 Size, RgbaByte Color, float Rotation = 0) : 
+            base(Window, new VertexPositionColor[4], new ushort[] { 0, 1, 2, 3 }, Rotation)
         {
-            var sizeDelta = new Vector2(VeldridHelpers.PercentToVeldrid(Size.X), VeldridHelpers.PercentToVeldrid(Size.Y));
-
+            //var sizeDelta = new Vector2(VeldridHelpers.PercentToVeldrid(Size.X), VeldridHelpers.PercentToVeldrid(Size.Y));
             // Bottom Left
-            Vector2 C = Position.Vector2();
+            //Vector2 C = Position.Vector2();
+
+            this.HalfSize = Size / 2;
+            // Bottom Left
+            Vector2 C = Position;
             // Top Left
-            Vector2 A = Vector2.Add(C, new Vector2(0, sizeDelta.Y));
+            Vector2 A = Vector2.Add(C, new Vector2(0, Size.Y));
             // Top Right
-            Vector2 B = Vector2.Add(C, sizeDelta);
+            Vector2 B = Vector2.Add(C, new Vector2(Size.X, Size.Y));
             // Bottom Right
-            Vector2 D = Vector2.Add(C, new Vector2(sizeDelta.X, 0));
+            Vector2 D = Vector2.Add(C, new Vector2(Size.X, 0));
 
             Vertices[0] = new VertexPositionColor(A, Color);
             Vertices[1] = new VertexPositionColor(B, Color);
             Vertices[2] = new VertexPositionColor(C, Color);
             Vertices[3] = new VertexPositionColor(D, Color);
 
-            VertexBuffer = Window.ResourceFactory.CreateBuffer(new BufferDescription(VerticesLength * VertexPositionColor.SizeInBytes, BufferUsage.VertexBuffer));
-            IndexBuffer = Window.ResourceFactory.CreateBuffer(new BufferDescription(VerticesLength * sizeof(ushort), BufferUsage.IndexBuffer));
+            if (Rotation == 0)
+            {
+                CalculateVertexBuffer();
+            }
+            else
+            {
+                RotateInternals();
+            }
 
-            Window.GraphicsDevice.UpdateBuffer(VertexBuffer, 0, Vertices);
-            Window.GraphicsDevice.UpdateBuffer(IndexBuffer, 0, Indices);
+            IndexBuffer = Window.ResourceFactory.CreateBuffer(new BufferDescription(VerticesCount * sizeof(ushort), BufferUsage.IndexBuffer));
+            Window.GraphicsDevice.UpdateBuffer(IndexBuffer, 0, Indexes);
 
             VertexLayoutDescription vertexLayout = new VertexLayoutDescription(
                 new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
@@ -63,6 +70,19 @@ namespace KeyOverlay2.Shapes
             pipelineDescription.Outputs = Window.GraphicsDevice.SwapchainFramebuffer.OutputDescription;
 
             Pipeline = Window.ResourceFactory.CreateGraphicsPipeline(pipelineDescription);
+        }
+
+        internal override void CalculateVertexBuffer()
+        {
+            VertexBuffer = Window.ResourceFactory.CreateBuffer(new BufferDescription(VerticesCount * VertexPositionColor.SizeInBytes, BufferUsage.VertexBuffer));
+            Window.GraphicsDevice.UpdateBuffer(VertexBuffer, 0, Vertices);
+        }
+
+        public override Vector2 GetCenter()
+        {
+            // Move so it's relative to the item
+            var movedToItem = Vector2.Add(Vertices[2].Position, HalfSize);
+            return movedToItem;
         }
 
         internal override void Draw()

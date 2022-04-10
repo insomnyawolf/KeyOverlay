@@ -28,8 +28,8 @@ namespace KeyOverlay2
 
             var windowCI = new WindowCreateInfo()
             {
-                X = -800,
-                Y = 100,
+                X = WindowConfig.XPosition,
+                Y = WindowConfig.YPosition,
                 WindowWidth = WindowConfig.Width,
                 WindowHeight = WindowConfig.Height,
                 WindowTitle = WindowConfig.WindowTitle,

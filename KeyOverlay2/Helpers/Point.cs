@@ -3,29 +3,38 @@ using Veldrid;
 
 namespace KeyOverlay2.Helpers
 {
-    internal static class VeldridHelpers
+    internal static class InternalHelpers
     {
         internal const float OnePercent = 2f / 100;
-        internal static float PercentToVeldrid(byte value)
+        internal static float PercentToVeldrid(float value)
         {
             return (float)(value * OnePercent);
         }
     }
 
-    internal class Point : Debug
+    public static class PublicHelpers
     {
-        public byte X { get; set; }
-        public byte Y { get; set; }
-
-        internal Vector2 Vector2()
+        public static Vector2 GetPointAtDefinedPercentages(float X, float Y)
         {
-            return new Vector2(VeldridHelpers.PercentToVeldrid(X) - 1, VeldridHelpers.PercentToVeldrid(Y) - 1);
+            return new Vector2(InternalHelpers.PercentToVeldrid(X) - 1, InternalHelpers.PercentToVeldrid(Y) - 1);
         }
     }
 
-    internal class Size : Debug
+
+    struct VertexPositionColor
     {
-        public byte X { get; set; }
-        public byte Y { get; set; }
+        // This is the position, in normalized device coordinates.
+        // Tldr where will be the things be relative to the window
+        public Vector2 Position { get; set; }
+        // This is the color of the vertex.
+        public RgbaByte Color { get; set; }
+        public VertexPositionColor(Vector2 position, RgbaByte color)
+        {
+            Position = position;
+            Color = color;
+        }
+
+        //Don't ask me how this is calculated, i'm confused as well
+        public const uint SizeInBytes = 12;
     }
 }

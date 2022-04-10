@@ -62,10 +62,11 @@ namespace LowLevelInputHooks
             OnKeyboardHookCallBack = new CallbackDelegate(KeybHookProc);
             OnMouseHookCallBack = new CallbackDelegate(MouseHookProc);
 
+            //0 for local hook. eller hwnd til user32 for global
+            int hInstance = 0;
+
             if (Global)
             {
-                //0 for local hook. eller hwnd til user32 for global
-                int hInstance = 0;
                 //0 for global hook. eller thread for hooken
                 int threadId = 0;
 
@@ -76,8 +77,6 @@ namespace LowLevelInputHooks
             }
             else
             {
-                //0 for local hook. eller hwnd til user32 for global
-                int hInstance = 0;
                 //0 for global hook. eller thread for hooken
                 int threadId = GetCurrentThreadId();
 
