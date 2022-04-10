@@ -1,4 +1,6 @@
-﻿namespace LowLevelInputHooks
+﻿using System.Runtime.InteropServices;
+
+namespace LowLevelInputHooks.DeviceSpecific.Windows
 {
     public enum MouseButton
     {
@@ -85,5 +87,23 @@
         ADJUSTRECT = 0x2000,
         FLAT = 0x4000,
         MONO = 0x8000
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal class MsllHookStruct
+    {
+        public Point Position;
+        public int mouseData;
+        public uint flags;
+        public uint time;
+        public IntPtr dwExtraInfo;
+        public int WheelDelta;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class Point
+    {
+        public int X;
+        public int Y;
     }
 }

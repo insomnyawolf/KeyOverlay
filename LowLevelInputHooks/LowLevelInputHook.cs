@@ -1,4 +1,6 @@
 ﻿using System.Runtime.InteropServices;
+using LowLevelInputHooks.DeviceSpecific;
+using LowLevelInputHooks.DeviceSpecific.Windows;
 
 namespace LowLevelInputHooks
 {
@@ -58,7 +60,7 @@ namespace LowLevelInputHooks
 #endif
 
             this.Global = Global;
-            
+
             OnKeyboardHookCallBack = new CallbackDelegate(KeybHookProc);
             OnMouseHookCallBack = new CallbackDelegate(MouseHookProc);
 
@@ -105,15 +107,23 @@ namespace LowLevelInputHooks
                 if (!Global)
                 {
                     // Overflow if you don't use int64
-                    var keydownup = L.ToInt64() >> 30;
+                    var keyState = L.ToInt64() >> 30;
 
-                    if (keydownup == 0)
+                    if (keyState == 0)
                     {
-                        input.KeyEvent = new KeyEvent((Keys)W, InputAction.Down, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
+                        input.KeyEvent = new KeyEvent((Keys)W, KeyboardInputAction.Down, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
                     }
-                    if (keydownup == 3)
+                    else if (keyState == 3)
                     {
-                        input.KeyEvent = new KeyEvent((Keys)W, InputAction.Up, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
+                        input.KeyEvent = new KeyEvent((Keys)W, KeyboardInputAction.Up, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
+                    }
+                    else if (keyState == 1)
+                    {
+                        input.KeyEvent = new KeyEvent((Keys)W, KeyboardInputAction.Repeat, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
+                    }
+                    else
+                    {
+                        throw new NotImplementedException($"keyState => {keyState}");
                     }
                 }
                 else
@@ -125,11 +135,15 @@ namespace LowLevelInputHooks
 
                     if (kEvent == RawKeyEvents.KeyDown || kEvent == RawKeyEvents.SKeyDown)
                     {
-                        input.KeyEvent = new KeyEvent((Keys)vkCode, InputAction.Down, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
+                        input.KeyEvent = new KeyEvent((Keys)vkCode, KeyboardInputAction.Down, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
                     }
-                    if (kEvent == RawKeyEvents.KeyUp || kEvent == RawKeyEvents.SKeyUp)
+                    else if (kEvent == RawKeyEvents.KeyUp || kEvent == RawKeyEvents.SKeyUp)
                     {
-                        input.KeyEvent = new KeyEvent((Keys)vkCode, InputAction.Up, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
+                        input.KeyEvent = new KeyEvent((Keys)vkCode, KeyboardInputAction.Up, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
+                    }
+                    else
+                    {
+                        throw new NotImplementedException($"keyState => {kEvent}");
                     }
                 }
 
@@ -138,6 +152,7 @@ namespace LowLevelInputHooks
             catch (Exception ex)
             {
 #if DEBUG
+                Console.WriteLine(ex.ToString());
                 throw;
 #else
 #warning shall we really?
@@ -199,13 +214,13 @@ namespace LowLevelInputHooks
                 return CallNextHookEx(MouseHookID, Code, W, L);
             }
 
-            var str = new MsllHookStruct();
-            Marshal.PtrToStructure(L, str);
+            var mouseExtraData = new MsllHookStruct();
+            Marshal.PtrToStructure(L, mouseExtraData);
 
             var input = new InputEvent()
             {
                 InputOrigin = InputOrigin.Mouse,
-                MouseEvent = new MouseEvent((MouseMessage)W, str)
+                MouseEvent = new WindowsMouseEvent((MouseMessage)W, mouseExtraData, Global)
             };
 
             OnKeyEvent?.Invoke(input);
@@ -213,16 +228,6 @@ namespace LowLevelInputHooks
 
             // Pass the hook information to the next hook procedure in chain
             return CallNextHookEx(MouseHookID, Code, W, L);
-
-        }
-
-        [DllImport("user32.dll")]
-        private static extern bool GetCursorPos(out Point lpPoint);
-
-        private Point GetMousePosition()
-        {
-            GetCursorPos(out var pos);
-            return pos;
         }
 
         #endregion mouse
@@ -231,38 +236,18 @@ namespace LowLevelInputHooks
         bool IsFinalized = false;
         ~LowLevelInputHook()
         {
-            if (!IsFinalized)
-            {
-                UnhookWindowsHookEx(KeyboardHookID);
-                UnhookWindowsHookEx(MouseHookID);
-                IsFinalized = true;
-            }
+            Dispose();
         }
+
         public void Dispose()
         {
             if (!IsFinalized)
             {
                 UnhookWindowsHookEx(KeyboardHookID);
+                UnhookWindowsHookEx(MouseHookID);
                 IsFinalized = true;
+                GC.SuppressFinalize(this);
             }
         }
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal class MsllHookStruct
-    {
-        public Point pt;
-        public uint mouseData;
-        public uint flags;
-        public uint time;
-        public IntPtr dwExtraInfo;
-        public int WheelDelta;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public class Point
-    {
-        public int x;
-        public int y;
     }
 }

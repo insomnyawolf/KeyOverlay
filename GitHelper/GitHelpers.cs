@@ -49,7 +49,7 @@ namespace GitHelper
             {
                 program();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 var exception = ex.ToString();
 

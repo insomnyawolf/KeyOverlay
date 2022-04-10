@@ -57,7 +57,7 @@ namespace KeyOverlay2
         private void DrawInternals(InputSnapshot input, float deltaTime)
         {
             CommandList.Begin();
-            
+
             CommandList.SetFramebuffer(GraphicsDevice.SwapchainFramebuffer);
             CommandList.ClearColorTarget(0, RgbaFloat.Black);
 
@@ -69,9 +69,11 @@ namespace KeyOverlay2
             {
                 GraphicsDevice.SwapBuffers(/*GraphicsDevice.MainSwapchain*/);
             }
-            catch(VeldridException ex)
+            catch (VeldridException ex)
             {
-
+#warning To-Do: only catch needed errors
+                // Vulkan explodes while closing it for some reason
+                Console.WriteLine(ex.ToString());
             }
         }
 

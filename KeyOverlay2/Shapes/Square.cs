@@ -10,7 +10,7 @@ namespace KeyOverlay2.Shapes
         private DeviceBuffer VertexBuffer;
         private DeviceBuffer IndexBuffer;
 
-        public Rect(BaseWindow Window, Vector2 Position, Vector2 Size, RgbaByte Color, float Rotation = 0) : 
+        public Rect(BaseWindow Window, Vector2 Position, Vector2 Size, RgbaByte Color, float Rotation = 0) :
             base(Window, new VertexPositionColor[4], new ushort[] { 0, 1, 2, 3 }, Rotation)
         {
             //var sizeDelta = new Vector2(VeldridHelpers.PercentToVeldrid(Size.X), VeldridHelpers.PercentToVeldrid(Size.Y));

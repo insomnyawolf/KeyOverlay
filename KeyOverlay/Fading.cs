@@ -2,11 +2,12 @@
 using SFML.Graphics;
 using SFML.System;
 
-namespace KeyOverlay {
+namespace KeyOverlay
+{
     public static class Fading
     {
 #warning fails after around 1 minute for some reason
-        public static List<Sprite> GetBackgroundColorFadingTexture(Color backgroundColor, uint windowWidth, double ratioY) 
+        public static List<Sprite> GetBackgroundColorFadingTexture(Color backgroundColor, uint windowWidth, double ratioY)
         {
             var sprites = new List<Sprite>();
             var alpha = 255d;

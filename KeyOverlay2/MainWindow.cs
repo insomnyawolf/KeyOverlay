@@ -1,9 +1,9 @@
 ﻿using System.Numerics;
 using System.Text;
 using ImGuiNET;
-using KeyOverlay2.Helpers;
 using KeyOverlay2.Shapes;
 using LowLevelInputHooks;
+using LowLevelInputHooks.DeviceSpecific;
 using Veldrid;
 using Veldrid.SPIRV;
 
@@ -81,9 +81,9 @@ namespace KeyOverlay2
         {
             //RectA.Draw();
             //CentA.Draw();
-            
+
             curentRotation += 10 * deltaTime;
-            RectB.Rotate(curentRotation);
+            //RectB.Rotate(curentRotation);
 
             var movement = Vector2.Zero;
 
@@ -111,6 +111,7 @@ namespace KeyOverlay2
                     movement.X--;
                 }
             }
+
             RectB.Translate(movement * deltaTime);
 
             RectB.Draw();

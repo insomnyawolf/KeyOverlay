@@ -1,4 +1,4 @@
-﻿namespace LowLevelInputHooks
+﻿namespace LowLevelInputHooks.DeviceSpecific.Windows
 {
     // Referenced from https://referencesource.microsoft.com/#System.Windows.Forms/winforms/Managed/System/WinForms/Keys.cs to avoid dependences on winforms
 

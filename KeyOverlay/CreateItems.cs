@@ -31,7 +31,7 @@ namespace KeyOverlay
                 square.OutlineColor = outlineColor;
                 square.OutlineThickness = outlineThickness;
                 square.Origin = new Vector2f(0, size);
-                square.Position = new Vector2f(margin + (outlineThickness + width + spacing) * i , (float)yPos); 
+                square.Position = new Vector2f(margin + (outlineThickness + width + spacing) * i, (float)yPos);
                 keyList.Add(square);
             }
             return keyList;
@@ -54,12 +54,12 @@ namespace KeyOverlay
             else if (rotation == 0)
             {
                 extraWidth = square.mySize.X / 2f;
-                extraHeight = square.mySize.X / 2f + text.CharacterSize/2f;
+                extraHeight = square.mySize.X / 2f + text.CharacterSize / 2f;
             }
-              
+
             if (counter)
             {
-                text.Position = new Vector2f(square.GetGlobalBounds().Left + square.OutlineThickness - text.CharacterSize /3 * 2 * rotation/90f + extraWidth,
+                text.Position = new Vector2f(square.GetGlobalBounds().Left + square.OutlineThickness - text.CharacterSize / 3 * 2 * rotation / 90f + extraWidth,
                     square.GetGlobalBounds().Top + square.OutlineThickness + text.CharacterSize * 3 / 2 + extraHeight);
             }
             else
@@ -67,7 +67,7 @@ namespace KeyOverlay
                 text.Position = new Vector2f(square.GetGlobalBounds().Left + square.OutlineThickness + square.mySize.X / 2f,
                     square.GetGlobalBounds().Top + square.OutlineThickness + square.mySize.Y / 2f);
             }
-            
+
             return text;
         }
     }

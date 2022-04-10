@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace ConfigHelper
 {
@@ -59,7 +59,7 @@ namespace ConfigHelper
             FileStream = File.Open(ConfigFullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
 
             Logger?.LogInformation($"The config file will be => {ConfigFullPath}");
-            
+
             Load();
 
             FileWatch();
