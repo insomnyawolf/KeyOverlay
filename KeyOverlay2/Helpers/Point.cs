@@ -3,20 +3,18 @@ using Veldrid;
 
 namespace KeyOverlay2.Helpers
 {
-    internal static class InternalHelpers
-    {
-        internal const float OnePercent = 2f / 100;
-        internal static float PercentToVeldrid(float value)
-        {
-            return (float)(value * OnePercent);
-        }
-    }
-
     public static class PublicHelpers
     {
+        private const float OnePercent = 2f / 100;
+
+        public static float PercentToVeldrid(float value)
+        {
+            return value * OnePercent;
+        }
+
         public static Vector2 GetPointAtDefinedPercentages(float X, float Y)
         {
-            return new Vector2(InternalHelpers.PercentToVeldrid(X) - 1, InternalHelpers.PercentToVeldrid(Y) - 1);
+            return new Vector2(PercentToVeldrid(X) - 1, PercentToVeldrid(Y) - 1);
         }
     }
 

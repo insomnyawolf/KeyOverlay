@@ -37,13 +37,14 @@ namespace KeyOverlay2
             //var veldridPointA = PublicHelpers.GetPointAtDefinedPercentages(10, 30);
 
             //RectA = new Rect(this, veldridPointA, new Vector2 { X = 0.5f, Y = 1f }, RgbaByte.Orange);
+            RectA = new Rect(this, new Vector2 { X = 0f, Y = 0f }, new Vector2 { X = 0.01f, Y = 0.01f }, RgbaByte.Orange);
 
             //CentA = new Rect(this, RectA.GetCenter(), new Vector2 { X = 0.01f, Y = 0.01f }, RgbaByte.Red);
 
             //var veldridPointB = PublicHelpers.GetPointAtDefinedPercentages(30, 30);
 
             //RectB = new Rect(this, veldridPointB, new Vector2 { X = 1f, Y = 1f }, RgbaByte.Blue);
-            RectB = new Rect(this, new Vector2 { X = -0.5f, Y = -0.5f }, new Vector2 { X = 1f, Y = 1f }, RgbaByte.Blue);
+            RectB = new Rect(this, new Vector2 { X = -0.1f, Y = -0.1f }, new Vector2 { X = 0.2f, Y = 0.2f }, RgbaByte.Blue);
         }
 
         private void HandleInput(InputEvent @event)
@@ -61,7 +62,7 @@ namespace KeyOverlay2
         internal override void Update(InputSnapshot input, float deltaTime)
         {
             Content(input, deltaTime);
-            //ImGuiMenus(input, deltaTime);
+            ImGuiMenus(input, deltaTime);
         }
 
         private void ImGuiMenus(InputSnapshot input, float deltaTime)
@@ -80,9 +81,6 @@ namespace KeyOverlay2
         
         private void Content(InputSnapshot test, float deltaTime)
         {
-            //RectA.Draw();
-            //CentA.Draw();
-
             curentRotation += 100 * deltaTime;
             RectB.Rotate(curentRotation);
 
@@ -116,6 +114,9 @@ namespace KeyOverlay2
             RectB.Translate(movement * deltaTime);
 
             RectB.Draw();
+            RectA.Draw();
+
+            //CentA.Draw();
         }
     }
 

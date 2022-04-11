@@ -11,11 +11,8 @@ namespace KeyOverlay2.Shapes
         public Rect(BaseWindow Window, Vector2 Position, Vector2 Size, RgbaByte Color, float Rotation = 0) :
             base(Window, new VertexPositionColor[4], new ushort[] { 0, 1, 2, 3 }, Rotation)
         {
-            //var sizeDelta = new Vector2(VeldridHelpers.PercentToVeldrid(Size.X), VeldridHelpers.PercentToVeldrid(Size.Y));
-            // Bottom Left
-            //Vector2 C = Position.Vector2();
+            this.HalfSize = Size / 2f;
 
-            this.HalfSize = Size / 2;
             // Bottom Left
             Vector2 C = Position;
             // Top Left
@@ -58,19 +55,15 @@ namespace KeyOverlay2.Shapes
             Pipeline = Window.ResourceFactory.CreateGraphicsPipeline(pipelineDescription);
         }
 
-        internal override void CalculateVertexBuffer()
+        // This is horrible and only work to calculate the center while the rotation is 0 degrees, i'm not clever enough to do it properly
+        // But since the center is cached, it works well enough
+        // Help me plz, i'm suffering
+        protected override Vector2 CalculateCenter()
         {
-            Window.GraphicsDevice.UpdateBuffer(VertexBuffer, 0, Vertices);
+            return Vector2.Add(Vertices[2].Position, HalfSize);
         }
 
-        public override Vector2 GetCenter()
-        {
-            // Move so it's relative to the item
-            var movedToItem = Vector2.Add(Vertices[2].Position, HalfSize);
-            return movedToItem;
-        }
-
-        internal override void Draw()
+        public override void Draw()
         {
             base.Draw();
             Window.CommandList.DrawIndexed(indexCount: 4, instanceCount: 1, indexStart: 0, vertexOffset: 0, instanceStart: 0);

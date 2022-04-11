@@ -15,6 +15,7 @@ namespace KeyOverlay2.Shapes
         protected DeviceBuffer IndexBuffer;
         private bool NeedVertexBufferUpdate = true;
 
+        protected Vector2 Center { get; private set; }
         internal uint VerticesCount => (uint)Vertices.Length;
 
         public Shape(BaseWindow Window, VertexPositionColor[] Vertices, ushort[] Indexes, float Rotation = 0) : base(Window)
@@ -27,6 +28,8 @@ namespace KeyOverlay2.Shapes
             Window.GraphicsDevice.UpdateBuffer(IndexBuffer, 0, Indexes);
 
             VertexBuffer = Window.ResourceFactory.CreateBuffer(new BufferDescription(VerticesCount * VertexPositionColor.SizeInBytes, BufferUsage.VertexBuffer));
+
+            Center = CalculateCenter();
         }
 
         public void Rotate(float newRotation)
@@ -44,7 +47,7 @@ namespace KeyOverlay2.Shapes
             CurrentRotation = newRotation;
         }
 
-        internal void RotateInternals()
+        private void RotateInternals()
         {
             if (CurrentRotation < 0)
             {
@@ -57,34 +60,35 @@ namespace KeyOverlay2.Shapes
                     CurrentRotation -= 360;
             }
 
-            var currentCenter = GetCenter();
-
             var temp = RadianConversionFactor * CurrentRotation;
 
             var cosA = MathF.Cos(temp);
             var sinA = MathF.Sin(temp);
 
-            for (int i = 0; i < Vertices.Length; i++)
+            if (Center != Vector2.Zero)
             {
-                Vertices[i].Position = Vector2.Subtract(Vertices[i].Position, currentCenter);
+                for (int i = 0; i < Vertices.Length; i++)
+                {
+                    Vertices[i].Position = Vector2.Subtract(Vertices[i].Position, Center);
+                }
             }
-
-            //var temp2 = GetCenter();
-
-            //for (int i = 0; i < Vertices.Length; i++)
-            //{
-            //    Vertices[i].Position = RotatePoint(Vertices[i].Position);
-            //}
 
             for (int i = 0; i < Vertices.Length; i++)
             {
-                Vertices[i].Position = Vector2.Add(Vertices[i].Position, currentCenter);
+                Vertices[i].Position = RotatePoint(Vertices[i].Position);
             }
 
-            CalculateVertexBuffer();
+            if (Center != Vector2.Zero)
+            {
+                for (int i = 0; i < Vertices.Length; i++)
+                {
+                    Vertices[i].Position = Vector2.Add(Vertices[i].Position, Center);
+                }
+            }
 
-            // Cry count to make worj on things that arent at 0,0
-            // Counter: 8
+#warning todo in the optimal way whith a arbitrary rotation matrix ;-;
+            // Cry count to make work on things that arent at 0,0
+            // Counter: 10
             Vector2 RotatePoint(Vector2 origin)
             {
                 return new Vector2()
@@ -97,9 +101,12 @@ namespace KeyOverlay2.Shapes
             NeedVertexBufferUpdate = true;
         }
 
-        internal abstract void CalculateVertexBuffer();
+        protected void CalculateVertexBuffer()
+        {
+            Window.GraphicsDevice.UpdateBuffer(VertexBuffer, 0, Vertices);
+        }
 
-        public abstract Vector2 GetCenter();
+        protected abstract Vector2 CalculateCenter();
 
         public void Translate(Vector2 translation)
         {
@@ -108,10 +115,12 @@ namespace KeyOverlay2.Shapes
                 Vertices[i].Position = Vector2.Add(Vertices[i].Position, translation);
             }
 
+            Center += translation;
+
             NeedVertexBufferUpdate = true;
         }
 
-        internal override void Draw()
+        public override void Draw()
         {
             if (NeedVertexBufferUpdate)
             {

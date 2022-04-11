@@ -4,15 +4,15 @@ namespace KeyOverlay2.Shapes
 {
     internal abstract class VeldridViewportItem : IDisposable
     {
-        internal Pipeline Pipeline;
-        internal readonly BaseWindow Window;
-
-        internal abstract void Draw();
+        protected Pipeline Pipeline;
+        protected readonly BaseWindow Window;        
 
         internal VeldridViewportItem(BaseWindow Window)
         {
             this.Window = Window;
         }
+
+        public abstract void Draw();
 
         // Destructor
         bool IsFinalized = false;
