@@ -7,8 +7,6 @@ namespace KeyOverlay2.Shapes
     internal class Rect : Shape
     {
         private readonly Vector2 HalfSize;
-        private DeviceBuffer VertexBuffer;
-        private DeviceBuffer IndexBuffer;
 
         public Rect(BaseWindow Window, Vector2 Position, Vector2 Size, RgbaByte Color, float Rotation = 0) :
             base(Window, new VertexPositionColor[4], new ushort[] { 0, 1, 2, 3 }, Rotation)
@@ -31,18 +29,6 @@ namespace KeyOverlay2.Shapes
             Vertices[1] = new VertexPositionColor(B, Color);
             Vertices[2] = new VertexPositionColor(C, Color);
             Vertices[3] = new VertexPositionColor(D, Color);
-
-            if (Rotation == 0)
-            {
-                CalculateVertexBuffer();
-            }
-            else
-            {
-                RotateInternals();
-            }
-
-            IndexBuffer = Window.ResourceFactory.CreateBuffer(new BufferDescription(VerticesCount * sizeof(ushort), BufferUsage.IndexBuffer));
-            Window.GraphicsDevice.UpdateBuffer(IndexBuffer, 0, Indexes);
 
             VertexLayoutDescription vertexLayout = new VertexLayoutDescription(
                 new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
@@ -74,7 +60,6 @@ namespace KeyOverlay2.Shapes
 
         internal override void CalculateVertexBuffer()
         {
-            VertexBuffer = Window.ResourceFactory.CreateBuffer(new BufferDescription(VerticesCount * VertexPositionColor.SizeInBytes, BufferUsage.VertexBuffer));
             Window.GraphicsDevice.UpdateBuffer(VertexBuffer, 0, Vertices);
         }
 
@@ -87,9 +72,7 @@ namespace KeyOverlay2.Shapes
 
         internal override void Draw()
         {
-            Window.CommandList.SetVertexBuffer(0, VertexBuffer);
-            Window.CommandList.SetIndexBuffer(IndexBuffer, IndexFormat.UInt16);
-            Window.CommandList.SetPipeline(Pipeline);
+            base.Draw();
             Window.CommandList.DrawIndexed(indexCount: 4, instanceCount: 1, indexStart: 0, vertexOffset: 0, instanceStart: 0);
         }
     }
