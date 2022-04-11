@@ -122,6 +122,12 @@ namespace LowLevelInputHooks
                     {
                         input.KeyEvent = new KeyEvent((Keys)W, KeyboardInputAction.Repeat, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
                     }
+                    else if (keyState == 2)
+                    {
+#warning investigate what keyState 2 really is
+                        // Windows keyboard shortcut?
+                        goto exit;
+                    }
                     else
                     {
                         throw new NotImplementedException($"keyState => {keyState}");
@@ -160,6 +166,8 @@ namespace LowLevelInputHooks
                 //Ignore all errors...
 #endif
             }
+
+        exit:
             return CallNextHookEx(KeyboardHookID, Code, W, L);
         }
 
