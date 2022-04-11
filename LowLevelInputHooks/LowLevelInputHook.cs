@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿//#define INPUTDEBUG
+using System.Runtime.InteropServices;
 using LowLevelInputHooks.DeviceSpecific;
 using LowLevelInputHooks.DeviceSpecific.Windows;
 
@@ -52,7 +53,7 @@ namespace LowLevelInputHooks
         //Start hook
         public LowLevelInputHook(bool Global)
         {
-#if DEBUG
+#if INPUTDEBUG
             OnKeyEvent += (InputEvent @event) =>
             {
                 Console.WriteLine(@event);
