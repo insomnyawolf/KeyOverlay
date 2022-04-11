@@ -43,7 +43,7 @@ namespace KeyOverlay2
             //var veldridPointB = PublicHelpers.GetPointAtDefinedPercentages(30, 30);
 
             //RectB = new Rect(this, veldridPointB, new Vector2 { X = 1f, Y = 1f }, RgbaByte.Blue);
-            RectB = new Rect(this, new Vector2 { X = -1f, Y = -0.5f }, new Vector2 { X = 1f, Y = 1f }, RgbaByte.Blue);
+            RectB = new Rect(this, new Vector2 { X = -0.5f, Y = -0.5f }, new Vector2 { X = 1f, Y = 1f }, RgbaByte.Blue);
         }
 
         private void HandleInput(InputEvent @event)
@@ -77,16 +77,17 @@ namespace KeyOverlay2
         }
 
         float curentRotation = 0;
+        
         private void Content(InputSnapshot test, float deltaTime)
         {
             //RectA.Draw();
             //CentA.Draw();
 
-            curentRotation += 10 * deltaTime;
-            //RectB.Rotate(curentRotation);
+            curentRotation += 100 * deltaTime;
+            RectB.Rotate(curentRotation);
 
-            var movement = Vector2.Zero;
-
+            Vector2 movement = Vector2.Zero;
+            
             for (int i = 0; i < test.KeyEvents.Count; i++)
             {
                 var current = test.KeyEvents[i];
