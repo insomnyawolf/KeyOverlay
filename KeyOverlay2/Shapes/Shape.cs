@@ -123,5 +123,25 @@ namespace KeyOverlay2.Shapes
             Window.CommandList.SetIndexBuffer(IndexBuffer, IndexFormat.UInt16);
             Window.CommandList.SetPipeline(Pipeline);
         }
+
+        // Destructor
+        bool IsFinalized = false;
+
+        ~Shape()
+        {
+            Dispose();
+        }
+
+        public override void Dispose()
+        {
+            if (!IsFinalized)
+            {
+                VertexBuffer.Dispose();
+                IndexBuffer.Dispose();
+                base.Dispose();
+                IsFinalized = true;
+                GC.SuppressFinalize(this);
+            }
+        }
     }
 }
