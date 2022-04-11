@@ -18,7 +18,7 @@ namespace KeyOverlay2
             ImguiRenderer = new ImGuiRenderer(GraphicsDevice, GraphicsDevice.MainSwapchain.Framebuffer.OutputDescription,
             (int)GraphicsDevice.MainSwapchain.Framebuffer.Width, (int)GraphicsDevice.MainSwapchain.Framebuffer.Height);
 
-            lowLevelInput.OnKeyEvent += HandleInput;
+            //lowLevelInput.OnKeyEvent += HandleInput;
 
             CreateResources();
         }
@@ -34,30 +34,9 @@ namespace KeyOverlay2
 
             Shaders = ResourceFactory.CreateFromSpirv(vertexShaderDesc, fragmentShaderDesc);
 
-            //var veldridPointA = PublicHelpers.GetPointAtDefinedPercentages(10, 30);
-
-            //RectA = new Rect(this, veldridPointA, new Vector2 { X = 0.5f, Y = 1f }, RgbaByte.Orange);
             RectA = new Rect(this, new Vector2 { X = 0f, Y = 0f }, new Vector2 { X = 0.01f, Y = 0.01f }, RgbaByte.Orange);
-
-            //CentA = new Rect(this, RectA.GetCenter(), new Vector2 { X = 0.01f, Y = 0.01f }, RgbaByte.Red);
-
-            //var veldridPointB = PublicHelpers.GetPointAtDefinedPercentages(30, 30);
-
-            //RectB = new Rect(this, veldridPointB, new Vector2 { X = 1f, Y = 1f }, RgbaByte.Blue);
             RectB = new Rect(this, new Vector2 { X = -0.1f, Y = -0.1f }, new Vector2 { X = 0.2f, Y = 0.2f }, RgbaByte.Blue);
-        }
-
-        private void HandleInput(InputEvent @event)
-        {
-            if (@event.InputOrigin == InputOrigin.Keyboard)
-            {
-
-            }
-            else if (@event.InputOrigin == InputOrigin.Mouse)
-            {
-
-            }
-        }
+        } 
 
         internal override void Update(InputSnapshot input, float deltaTime)
         {
@@ -112,6 +91,8 @@ namespace KeyOverlay2
             }
 
             RectB.Translate(movement * deltaTime);
+
+            Console.WriteLine(RectB.Center);
 
             RectB.Draw();
             RectA.Draw();

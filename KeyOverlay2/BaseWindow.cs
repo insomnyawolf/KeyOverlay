@@ -64,6 +64,7 @@ namespace KeyOverlay2
 
             CommandList.End();
             GraphicsDevice.SubmitCommands(CommandList);
+
             try
             {
                 GraphicsDevice.SwapBuffers(/*GraphicsDevice.MainSwapchain*/);

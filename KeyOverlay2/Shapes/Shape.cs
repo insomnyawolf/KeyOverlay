@@ -6,22 +6,34 @@ namespace KeyOverlay2.Shapes
 {
     internal abstract class Shape : VeldridViewportItem
     {
-        private float CurrentRotation { get; set; }
         private const float RadianConversionFactor = MathF.PI / 180;
+
+
+        public float CurrentRotation { get; private set; }
+        public Vector2 Center { get; private set; }
+
 
         protected readonly ushort[] Indexes;
         protected readonly VertexPositionColor[] Vertices;
+        protected readonly Vector2[] UnRotatedVertices;
         protected DeviceBuffer VertexBuffer;
         protected DeviceBuffer IndexBuffer;
         private bool NeedVertexBufferUpdate = true;
 
-        protected Vector2 Center { get; private set; }
         internal uint VerticesCount => (uint)Vertices.Length;
 
         public Shape(BaseWindow Window, VertexPositionColor[] Vertices, ushort[] Indexes, float Rotation = 0) : base(Window)
         {
             this.Indexes = Indexes;
             this.Vertices = Vertices;
+            this.UnRotatedVertices = new Vector2[Vertices.Length];
+
+            for (int i = 0; i < Vertices.Length; i++)
+            {
+                var current = Vertices[i].Position;
+                UnRotatedVertices[i] = new Vector2(current.X, current.Y);
+            }
+
             this.CurrentRotation = CurrentRotation;
 
             IndexBuffer = Window.ResourceFactory.CreateBuffer(new BufferDescription(VerticesCount * sizeof(ushort), BufferUsage.IndexBuffer));
@@ -75,7 +87,7 @@ namespace KeyOverlay2.Shapes
 
             for (int i = 0; i < Vertices.Length; i++)
             {
-                Vertices[i].Position = RotatePoint(Vertices[i].Position);
+                Vertices[i].Position = RotatePoint(Vertices[i].Position, cosA, sinA);
             }
 
             if (Center != Vector2.Zero)
@@ -89,16 +101,18 @@ namespace KeyOverlay2.Shapes
 #warning todo in the optimal way whith a arbitrary rotation matrix ;-;
             // Cry count to make work on things that arent at 0,0
             // Counter: 10
-            Vector2 RotatePoint(Vector2 origin)
-            {
-                return new Vector2()
-                {
-                    X = origin.X * cosA - origin.Y * sinA,
-                    Y = origin.X * sinA + origin.Y * cosA,
-                };
-            }
+            
 
             NeedVertexBufferUpdate = true;
+        }
+
+        internal Vector2 RotatePoint(Vector2 origin, float cosA, float sinA)
+        {
+            return new Vector2()
+            {
+                X = origin.X * cosA - origin.Y * sinA,
+                Y = origin.X * sinA + origin.Y * cosA,
+            };
         }
 
         protected void CalculateVertexBuffer()
@@ -112,7 +126,8 @@ namespace KeyOverlay2.Shapes
         {
             for (int i = 0; i < Vertices.Length; i++)
             {
-                Vertices[i].Position = Vector2.Add(Vertices[i].Position, translation);
+                Vertices[i].Position += translation;
+                UnRotatedVertices[i] += translation;
             }
 
             Center += translation;

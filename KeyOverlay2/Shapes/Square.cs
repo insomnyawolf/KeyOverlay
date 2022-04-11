@@ -60,7 +60,7 @@ namespace KeyOverlay2.Shapes
         // Help me plz, i'm suffering
         protected override Vector2 CalculateCenter()
         {
-            return Vector2.Add(Vertices[2].Position, HalfSize);
+            return Vector2.Add(UnRotatedVertices[2], HalfSize);
         }
 
         public override void Draw()
