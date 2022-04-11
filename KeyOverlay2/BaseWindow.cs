@@ -8,7 +8,6 @@ namespace KeyOverlay2
     public abstract class BaseWindow
     {
         private readonly Stopwatch StopWatch = new();
-
         internal readonly Sdl2Window Window;
         internal readonly GraphicsDevice GraphicsDevice;
         internal readonly ResourceFactory ResourceFactory;
@@ -91,10 +90,12 @@ namespace KeyOverlay2
             DisposeResources();
         }
 
-        // Compute actual value for deltaSeconds.
+        // Compute actual value for deltaSeconds so i can normalize the speed of things...
+
         private float Frametime()
         {
-            var frametime = StopWatch.ElapsedMilliseconds / 1000f;
+            
+            var frametime = (float)StopWatch.ElapsedTicks / Stopwatch.Frequency;
             StopWatch.Restart();
             return frametime;
         }
