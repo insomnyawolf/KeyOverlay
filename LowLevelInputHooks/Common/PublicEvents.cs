@@ -1,8 +1,9 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using LowLevelInputHooks.DeviceSpecific.Windows;
+// Using this for now till i define real common ones
+using LowLevelInputHooks.OsSpecific.Windows.Devices;
 
-namespace LowLevelInputHooks.DeviceSpecific
+namespace LowLevelInputHooks.Common
 {
     public class InputEvent : EventArgs
     {
@@ -40,12 +41,12 @@ namespace LowLevelInputHooks.DeviceSpecific
     public class KeyEvent : InputEventBase
     {
         public Keys Key { get; protected set; }
-        public KeyboardInputAction InputAction { get; protected set; }
+        public KeyAction InputAction { get; protected set; }
         public bool Shift { get; protected set; }
         public bool Ctrl { get; protected set; }
         public bool Alt { get; protected set; }
 
-        internal KeyEvent(Keys Key, KeyboardInputAction InputType, bool Shift, bool Ctrl, bool Alt)
+        internal KeyEvent(Keys Key, KeyAction InputType, bool Shift, bool Ctrl, bool Alt)
         {
             this.Key = Key;
             this.Shift = Shift;
@@ -58,7 +59,7 @@ namespace LowLevelInputHooks.DeviceSpecific
     public class MouseEvent : InputEventBase
     {
         public MouseButton MouseButton { get; protected set; }
-        public MouseInputAction InputAction { get; protected set; }
+        public MouseAction InputAction { get; protected set; }
         public Point Position { get; protected set; }
     }
 

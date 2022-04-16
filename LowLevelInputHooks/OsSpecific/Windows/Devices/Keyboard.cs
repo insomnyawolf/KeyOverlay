@@ -1,5 +1,12 @@
-﻿namespace LowLevelInputHooks.DeviceSpecific.Windows
+﻿namespace LowLevelInputHooks.OsSpecific.Windows.Devices
 {
+    internal enum RawKeyEvents
+    {
+        KeyDown = 0x0100,
+        KeyUp = 0x0101,
+        SKeyDown = 0x0104,
+        SKeyUp = 0x0105
+    }
     // Referenced from https://referencesource.microsoft.com/#System.Windows.Forms/winforms/Managed/System/WinForms/Keys.cs to avoid dependences on winforms
 
     //------------------------------------------------------------------------------

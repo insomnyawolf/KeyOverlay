@@ -3,6 +3,7 @@ using ImGuiNET;
 using InEngine;
 using InEngine.Shapes;
 using LowLevelInputHooks;
+using LowLevelInputHooks.OsSpecific.Windows;
 using Veldrid;
 using Veldrid.SPIRV;
 
@@ -12,7 +13,7 @@ namespace InEngineTestProject
     {
         protected readonly ImGuiRenderer ImguiRenderer;
 
-        public MainWindow(InEngineConfig Config, LowLevelInputHook lowLevelInput) : base(Config)
+        public MainWindow(InEngineConfig Config, InputHook InputHook) : base(Config)
         {
             ImguiRenderer = new ImGuiRenderer(GraphicsDevice, GraphicsDevice.MainSwapchain.Framebuffer.OutputDescription,
             (int)GraphicsDevice.MainSwapchain.Framebuffer.Width, (int)GraphicsDevice.MainSwapchain.Framebuffer.Height);

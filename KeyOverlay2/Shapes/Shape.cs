@@ -76,7 +76,7 @@ namespace InEngine.Shapes
 
 #warning todo in the optimal way whith a arbitrary rotation matrix ;-; if i get to find it
             // Cry count to make work on things that arent at 0,0
-            // Counter: 10
+            // Counter: 11
 
             for (int i = 0; i < VerticesCount; i++)
             {

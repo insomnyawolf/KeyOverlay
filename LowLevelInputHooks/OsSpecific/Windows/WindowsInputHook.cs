@@ -1,18 +1,12 @@
-﻿//#define INPUTDEBUG
-using System.Runtime.InteropServices;
-using LowLevelInputHooks.DeviceSpecific;
-using LowLevelInputHooks.DeviceSpecific.Windows;
+﻿using System.Runtime.InteropServices;
+using LowLevelInputHooks.Common;
+using LowLevelInputHooks.OsSpecific.Windows.Devices;
 
-namespace LowLevelInputHooks
+namespace LowLevelInputHooks.OsSpecific.Windows
 {
     // Based on https://stackoverflow.com/questions/46013287/c-sharp-global-keyboard-hook-that-opens-a-form-from-a-console-application
-    public class LowLevelInputHook : IDisposable
+    internal class WindowsInputHook : InputHookBase, IDisposable
     {
-        private readonly bool Global;
-
-        public delegate void InputEventDelegate(InputEvent @event);
-        public event InputEventDelegate OnKeyEvent;
-
         private delegate int CallbackDelegate(int Code, IntPtr W, IntPtr L);
 
         [DllImport("user32", CallingConvention = CallingConvention.StdCall)]
@@ -25,6 +19,12 @@ namespace LowLevelInputHooks
         private static extern int GetCurrentThreadId();
         [DllImport("user32.dll")]
         private static extern short GetKeyState(Keys nVirtKey);
+
+        private readonly int KeyboardHookID;
+        private readonly CallbackDelegate OnKeyboardHookCallBack;
+
+        private readonly int MouseHookID;
+        private readonly CallbackDelegate OnMouseHookCallBack;
 
         private enum HookType : int
         {
@@ -44,31 +44,17 @@ namespace LowLevelInputHooks
             WH_KEYBOARD_LL = 13,
             WH_MOUSE_LL = 14
         }
-        private readonly int KeyboardHookID;
-        private readonly CallbackDelegate OnKeyboardHookCallBack;
-
-        private readonly int MouseHookID;
-        private readonly CallbackDelegate OnMouseHookCallBack;
 
         //Start hook
-        public LowLevelInputHook(bool Global)
+        internal WindowsInputHook(bool IsGlobal) : base(IsGlobal)
         {
-#if INPUTDEBUG
-            OnKeyEvent += (InputEvent @event) =>
-            {
-                Console.WriteLine(@event);
-            };
-#endif
-
-            this.Global = Global;
-
             OnKeyboardHookCallBack = new CallbackDelegate(KeybHookProc);
             OnMouseHookCallBack = new CallbackDelegate(MouseHookProc);
 
             //0 for local hook. eller hwnd til user32 for global
             int hInstance = 0;
 
-            if (Global)
+            if (IsGlobal)
             {
                 //0 for global hook. eller thread for hooken
                 int threadId = 0;
@@ -105,22 +91,22 @@ namespace LowLevelInputHooks
                     InputOrigin = InputOrigin.Keyboard,
                 };
 
-                if (!Global)
+                if (!IsGlobal)
                 {
                     // Overflow if you don't use int64
                     var keyState = L.ToInt64() >> 30;
 
                     if (keyState == 0)
                     {
-                        input.KeyEvent = new KeyEvent((Keys)W, KeyboardInputAction.Down, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
+                        input.KeyEvent = new KeyEvent((Keys)W, KeyAction.Down, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
                     }
                     else if (keyState == 3)
                     {
-                        input.KeyEvent = new KeyEvent((Keys)W, KeyboardInputAction.Up, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
+                        input.KeyEvent = new KeyEvent((Keys)W, KeyAction.Up, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
                     }
                     else if (keyState == 1)
                     {
-                        input.KeyEvent = new KeyEvent((Keys)W, KeyboardInputAction.Repeat, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
+                        input.KeyEvent = new KeyEvent((Keys)W, KeyAction.Repeat, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
                     }
                     else if (keyState == 2)
                     {
@@ -142,11 +128,11 @@ namespace LowLevelInputHooks
 
                     if (kEvent == RawKeyEvents.KeyDown || kEvent == RawKeyEvents.SKeyDown)
                     {
-                        input.KeyEvent = new KeyEvent((Keys)vkCode, KeyboardInputAction.Down, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
+                        input.KeyEvent = new KeyEvent((Keys)vkCode, KeyAction.Down, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
                     }
                     else if (kEvent == RawKeyEvents.KeyUp || kEvent == RawKeyEvents.SKeyUp)
                     {
-                        input.KeyEvent = new KeyEvent((Keys)vkCode, KeyboardInputAction.Up, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
+                        input.KeyEvent = new KeyEvent((Keys)vkCode, KeyAction.Up, GetShiftPressed(), GetCtrlPressed(), GetAltPressed());
                     }
                     else
                     {
@@ -154,7 +140,7 @@ namespace LowLevelInputHooks
                     }
                 }
 
-                OnKeyEvent?.Invoke(input);
+                Invoke(input);
             }
             catch (Exception ex)
             {
@@ -171,26 +157,21 @@ namespace LowLevelInputHooks
             return CallNextHookEx(KeyboardHookID, Code, W, L);
         }
 
-        private enum RawKeyEvents
-        {
-            KeyDown = 0x0100,
-            KeyUp = 0x0101,
-            SKeyDown = 0x0104,
-            SKeyUp = 0x0105
-        }
+        //public static bool GetCapslock()
+        //{
+        //    return Convert.ToBoolean(GetKeyState(Keys.CapsLock)) & true;
+        //}
+        //public static bool GetNumlock()
+        //{
+        //    return Convert.ToBoolean(GetKeyState(Keys.NumLock)) & true;
+        //}
+        //public static bool GetScrollLock()
+        //{
+        //    return Convert.ToBoolean(GetKeyState(Keys.Scroll)) & true;
+        //}
 
-        public static bool GetCapslock()
-        {
-            return Convert.ToBoolean(GetKeyState(Keys.CapsLock)) & true;
-        }
-        public static bool GetNumlock()
-        {
-            return Convert.ToBoolean(GetKeyState(Keys.NumLock)) & true;
-        }
-        public static bool GetScrollLock()
-        {
-            return Convert.ToBoolean(GetKeyState(Keys.Scroll)) & true;
-        }
+#warning optimize this via getting keystate as maybe it's not needed? (will make a wrapper that returns an inputstate where you can ask the current key state.
+
         public static bool GetShiftPressed()
         {
             int state = GetKeyState(Keys.ShiftKey);
@@ -216,7 +197,7 @@ namespace LowLevelInputHooks
         #endregion keyboard
 
         #region mouse
-        public int MouseHookProc(int Code, IntPtr W, IntPtr L)
+        private int MouseHookProc(int Code, IntPtr W, IntPtr L)
         {
             if (Code < 0)
             {
@@ -229,11 +210,10 @@ namespace LowLevelInputHooks
             var input = new InputEvent()
             {
                 InputOrigin = InputOrigin.Mouse,
-                MouseEvent = new WindowsMouseEvent((MouseMessage)W, mouseExtraData, Global)
+                MouseEvent = new WindowsMouseEvent((MouseMessage)W, mouseExtraData, IsGlobal)
             };
 
-            OnKeyEvent?.Invoke(input);
-
+            Invoke(input);
 
             // Pass the hook information to the next hook procedure in chain
             return CallNextHookEx(MouseHookID, Code, W, L);
@@ -243,15 +223,17 @@ namespace LowLevelInputHooks
 
         // Destructor
         bool IsFinalized = false;
-        ~LowLevelInputHook()
+
+        ~WindowsInputHook()
         {
             Dispose();
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             if (!IsFinalized)
             {
+                base.Dispose();
                 UnhookWindowsHookEx(KeyboardHookID);
                 UnhookWindowsHookEx(MouseHookID);
                 IsFinalized = true;

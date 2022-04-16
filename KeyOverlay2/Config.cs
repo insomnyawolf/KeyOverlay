@@ -1,5 +1,4 @@
-﻿using GitHelper;
-using Veldrid;
+﻿using Veldrid;
 
 namespace InEngine
 {
