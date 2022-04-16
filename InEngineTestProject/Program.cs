@@ -25,6 +25,13 @@ namespace InEngineTestProject
 
         private static void Run()
         {
+            //// MultiWindow not working
+            //Task.Run(() =>
+            //{
+            //    var window2 = new MainWindow(Config.InEngineConfig, InputHook);
+            //    window2.Start();
+            //});
+
             var window = new MainWindow(Config.InEngineConfig, InputHook);
             window.Start();
         }
