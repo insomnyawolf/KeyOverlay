@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using Veldrid;
 
-namespace KeyOverlay2.Helpers
+namespace InEngine.Helpers
 {
     public static class PublicHelpers
     {
@@ -19,7 +19,7 @@ namespace KeyOverlay2.Helpers
     }
 
 
-    struct VertexPositionColor
+    public struct VertexPositionColor
     {
         // This is the position, in normalized device coordinates.
         // Tldr where will be the things be relative to the window

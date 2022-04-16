@@ -2,7 +2,7 @@
 using GitHelper;
 using LowLevelInputHooks;
 
-namespace KeyOverlay2
+namespace InEngineTestProject
 {
     public static class Program
     {
@@ -25,7 +25,7 @@ namespace KeyOverlay2
 
         private static void Run()
         {
-            var window = new MainWindow(Config.AppConfig, LowLevelGlobalInputHook);
+            var window = new MainWindow(Config.InEngineConfig, LowLevelGlobalInputHook);
             window.Start();
         }
     }

@@ -1,19 +1,9 @@
 ﻿using GitHelper;
 using Veldrid;
 
-namespace KeyOverlay2
+namespace InEngine
 {
-    public class Config
-    {
-        public GitHelpersConfig GitHelpersConfig { get; set; } = new()
-        {
-            GitUrl = "https://github.com/insomnyawolf/KeyOverlay/",
-        };
-
-        public AppConfig AppConfig { get; set; } = new();
-    }
-
-    public class AppConfig
+    public class InEngineConfig
     {
         public WindowConfig WindowConfig { get; set; } = new();
     }

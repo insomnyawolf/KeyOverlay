@@ -1,10 +1,10 @@
 ﻿using System.Numerics;
-using KeyOverlay2.Helpers;
+using InEngine.Helpers;
 using Veldrid;
 
-namespace KeyOverlay2.Shapes
+namespace InEngine.Shapes
 {
-    internal class Rect : Shape
+    public class Rect : Shape
     {
         private readonly Vector2 HalfSize;
 

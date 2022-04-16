@@ -7,11 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KeyOverlay", "KeyOverlay\Ke
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigHelper", "ConfigHelper\ConfigHelper.csproj", "{BC36145E-D2BF-4DAA-875B-A2186DCFCE24}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KeyOverlay2", "KeyOverlay2\KeyOverlay2.csproj", "{E220A128-801D-42D8-A06A-E129026D71D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InEngine", "KeyOverlay2\InEngine.csproj", "{E220A128-801D-42D8-A06A-E129026D71D7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHelper", "GitHelper\GitHelper.csproj", "{DD2EB901-8FD8-4056-9AA8-A623F1A13203}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LowLevelInputHooks", "LowLevelInputHooks\LowLevelInputHooks.csproj", "{031C0870-5447-4855-B5DF-C8046183869B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LowLevelInputHooks", "LowLevelInputHooks\LowLevelInputHooks.csproj", "{031C0870-5447-4855-B5DF-C8046183869B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InEngineTestProject", "InEngineTestProject\InEngineTestProject.csproj", "{C06A63E6-0975-4C1D-BA78-5EB5864A6F23}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{031C0870-5447-4855-B5DF-C8046183869B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{031C0870-5447-4855-B5DF-C8046183869B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{031C0870-5447-4855-B5DF-C8046183869B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C06A63E6-0975-4C1D-BA78-5EB5864A6F23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C06A63E6-0975-4C1D-BA78-5EB5864A6F23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C06A63E6-0975-4C1D-BA78-5EB5864A6F23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C06A63E6-0975-4C1D-BA78-5EB5864A6F23}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

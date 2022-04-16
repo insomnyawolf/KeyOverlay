@@ -1,13 +1,13 @@
 ﻿using Veldrid;
 
-namespace KeyOverlay2.Shapes
+namespace InEngine.Shapes
 {
-    internal abstract class VeldridViewportItem : IDisposable
+    public abstract class VeldridViewportItem : IDisposable
     {
         protected Pipeline Pipeline;
         protected readonly BaseWindow Window;        
 
-        internal VeldridViewportItem(BaseWindow Window)
+        public VeldridViewportItem(BaseWindow Window)
         {
             this.Window = Window;
         }

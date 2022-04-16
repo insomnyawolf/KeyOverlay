@@ -3,27 +3,25 @@ using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
 
-namespace KeyOverlay2
+namespace InEngine
 {
     public abstract class BaseWindow
     {
         private readonly Stopwatch StopWatch = new();
-        internal readonly Sdl2Window Window;
-        internal readonly GraphicsDevice GraphicsDevice;
-        internal readonly ResourceFactory ResourceFactory;
-
+        protected readonly Sdl2Window Window;
+        protected internal readonly GraphicsDevice GraphicsDevice;
+        protected internal readonly ResourceFactory ResourceFactory;
         // Using a single command list to avoid weird render behaviour in screenshoots
-        internal readonly CommandList CommandList;
+        protected internal readonly CommandList CommandList;
+        protected internal Shader[] Shaders;
 
-        internal Shader[] Shaders;
+        internal readonly InEngineConfig InEngineConfig;
 
-        internal readonly AppConfig AppConfig;
-
-        public BaseWindow(AppConfig Config)
+        public BaseWindow(InEngineConfig Config)
         {
-            AppConfig = Config;
+            InEngineConfig = Config;
 
-            var WindowConfig = AppConfig.WindowConfig;
+            var WindowConfig = InEngineConfig.WindowConfig;
 
             var windowCI = new WindowCreateInfo()
             {
@@ -77,7 +75,7 @@ namespace KeyOverlay2
             }
         }
 
-        internal abstract void Update(InputSnapshot input, float deltaTime);
+        protected abstract void Update(InputSnapshot input, float deltaTime);
 
         public void Start()
         {
@@ -95,7 +93,6 @@ namespace KeyOverlay2
 
         private float Frametime()
         {
-            
             var frametime = (float)StopWatch.ElapsedTicks / Stopwatch.Frequency;
             StopWatch.Restart();
             return frametime;
